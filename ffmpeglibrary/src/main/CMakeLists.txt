@@ -9,9 +9,9 @@ cmake_minimum_required(VERSION 3.10.2)
 project("android_ffmpeg")
 
 #设置生成的so动态库最后输出的路径
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../libs1/${ANDROID_ABI})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../libs/${ANDROID_ABI})
 # 1. 定义so库和头文件所在目录，方面后面使用
-set(ffmpeg_lib_dir ${PROJECT_SOURCE_DIR}/jni/armv8-a/lib)
+set(ffmpeg_lib_dir ${PROJECT_SOURCE_DIR}/../libs/${ANDROID_ABI})
 
 ##当前../jni目录的所有.c .cpp源文件,并且赋值到SRC_LIST
 AUX_SOURCE_DIRECTORY(${PROJECT_SOURCE_DIR}/jni/include SRC_LIST)
@@ -68,6 +68,20 @@ set_target_properties( avformat
         PROPERTIES IMPORTED_LOCATION
         ${ffmpeg_lib_dir}/libavformat.so )
 
+add_library( postproc
+        SHARED
+        IMPORTED)
+set_target_properties( postproc
+        PROPERTIES IMPORTED_LOCATION
+        ${ffmpeg_lib_dir}/libpostproc.so )
+
+
+add_library( avdevice
+        SHARED
+        IMPORTED)
+set_target_properties( avdevice
+        PROPERTIES IMPORTED_LOCATION
+        ${ffmpeg_lib_dir}/libavdevice.so )
 
 # 配置目标so库编译信息
 add_library( # Sets the name of the library.
@@ -107,6 +121,8 @@ target_link_libraries( # Specifies the target library.
         avfilter
         swscale
         avformat
+        postproc
+        avdevice
 
         # Links the target library to the log library
         # included in the NDK.
