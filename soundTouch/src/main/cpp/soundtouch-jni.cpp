@@ -19,7 +19,6 @@ using namespace std;
 #include "soundtouch/WavFile.h"
 
 #define LOGV(...)   __android_log_print((int)ANDROID_LOG_INFO, "SOUNDTOUCH", __VA_ARGS__)
-//#define LOGV(...)
 
 
 // String for keeping possible c++ exception error messages. Notice that this isn't

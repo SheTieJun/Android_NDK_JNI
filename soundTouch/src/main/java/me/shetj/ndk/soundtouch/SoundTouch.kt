@@ -10,18 +10,15 @@ object SoundTouch {
     init {
         System.loadLibrary("soundTouch")
     }
-    val versionString: String?
-        external get
-    val errorString: String?
-        external get
 
-    external fun setTempo(handle: Long, tempo: Float)
-    external fun setPitchSemiTones(handle: Long, pitch: Float)
-    external fun setSpeed(handle: Long, speed: Float)
-    external fun processFile(handle: Long, inputFile: String, outputFile: String): Int
-    external fun deleteInstance(handle: Long)
+    private external fun setTempo(handle: Long, tempo: Float)
+    private external fun setPitchSemiTones(handle: Long, pitch: Float)
+    private external fun setSpeed(handle: Long, speed: Float)
+    private external fun processFile(handle: Long, inputFile: String, outputFile: String): Int
+    private external fun deleteInstance(handle: Long)
     external fun newInstance(): Long
-
+    external fun getVersionString(): String
+    external fun getErrorString(): String
 
     var handle: Long = 0
 

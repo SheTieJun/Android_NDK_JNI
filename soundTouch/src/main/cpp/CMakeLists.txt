@@ -31,7 +31,7 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             SoundTouchKit.cpp
+             soundtouch-jni.cpp
             ${SRC_LIST})
 
 # Searches for a specified prebuilt library and stores the path as a

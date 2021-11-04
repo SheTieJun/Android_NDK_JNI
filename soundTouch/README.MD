@@ -1,4 +1,5 @@
 ## SoundTouch公开函数与参数的说明
+- version:2.3.1
 
 ### 采样：
 setChannels(int) 设置声道，1 = mono单声道, 2 = stereo立体声
