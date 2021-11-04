@@ -14,6 +14,7 @@ project("demo")
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
 
+add_definitions(-DDEBUG)
 add_library( # Sets the name of the library.
              native-lib
 
@@ -42,7 +43,8 @@ find_library( # Sets the name of the path variable.
 
 target_link_libraries( # Specifies the target library.
                        native-lib
-
+                        # bitmap 图片处理相关
+                         jnigraphics
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )

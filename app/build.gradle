@@ -4,12 +4,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
-
+    compileSdkVersion 30
     defaultConfig {
         applicationId "me.shetj.sdk.ffmepg.demo"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
@@ -26,14 +25,19 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            jniDebuggable false
+            debuggable false
+        }
+        debug {
+            jniDebuggable true
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
     externalNativeBuild {
         cmake {
@@ -46,7 +50,7 @@ android {
     }
     sourceSets.main {
         jniLibs.srcDirs = ['libs']
-        jni.srcDirs = []
+        jni.srcDirs=['src/main/cpp']
     }
 }
 

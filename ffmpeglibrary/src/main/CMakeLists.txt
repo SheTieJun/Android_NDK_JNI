@@ -2,7 +2,7 @@
 # documentation: https://d.android.com/studio/projects/add-native-code.html
 
 # Sets the minimum version of CMake required to build the native library.
-
+#指定 Cmake 需要的最低版本
 cmake_minimum_required(VERSION 3.10.2)
 
 # Declares and names the project.
@@ -26,6 +26,11 @@ include_directories(${PROJECT_SOURCE_DIR}/jni/include)
 
 
 # 3. 添加ffmpeg相关的so库
+#创建和命名该库，第一个参数是库的名字，例如取名为 native-lib，将会生成一个命名为 libnative-lib.so 的库。
+#    第二个参数是指定库的类型，一般为 SHARED，即动态库（以 .so 为后缀），还有一种是静态库 STATIC，即静态库（以 .a 为后缀）。
+#    第三个参数是指定该库使用的源文件路径。
+#    使用多个 add_library() 命令，您可以为 CMake 定义要从其他源文件构建的更多库。
+# set_target_properties 设置输出别名，所以，希望 "hello_static" 在输出时，不是"hello_static"，而是以"hello"的名字显示，故设置如下
 add_library( avutil
         SHARED
         IMPORTED )
@@ -99,6 +104,8 @@ add_library( # Sets the name of the library.
 # default, you only need to specify the name of the public NDK library
 # you want to add. CMake verifies that the library exists before
 # completing its build.
+# 找到一个 NDK 的库，并且将这个库的路径存储在一个变量中。例如上例中是找到 NDK 中的 log 库（Android 特定的日志支持库），
+# 并将其路径存储在 “log-lib” 变量中，在后面你就可以通过 “${log-lib}” 命令取出变量中的值了。
 # 查找代码中使用到的系统库
 find_library( # Sets the name of the path variable.
         log-lib
@@ -110,7 +117,8 @@ find_library( # Sets the name of the path variable.
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
-#指定库的库应该链接到你的目标库。您可以链接多个库，比如在这个构建脚本中定义的库、预构建的第三方库或系统库。
+# 关联库。将指定的库关联起来 。
+# 指定库的库应该链接到你的目标库。您可以链接多个库，比如在这个构建脚本中定义的库、预构建的第三方库或系统库。
 target_link_libraries( # Specifies the target library.
         ffmpeg_lib
 
