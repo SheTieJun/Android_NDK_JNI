@@ -19,8 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         // Example of a call to a native method
         try {
-            binding.sampleText.text = FFmpegKit.checkFFmpeg()
-//            binding.sampleText.text = stringFromJNI()
+            binding.sampleText.text = stringFromJNI()
         }catch (e:Exception){
             e.printStackTrace()
         }

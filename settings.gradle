@@ -1,4 +1,4 @@
 rootProject.name = "Android_ffmpeg"
 include ':app'
-include ':ffmpeglibrary'
+include ':ffmpeg'
 include ':soundTouch'

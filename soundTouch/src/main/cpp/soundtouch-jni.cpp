@@ -1,13 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
-///
-/// Example Interface class for SoundTouch native compilation
-///
-/// Author        : Copyright (c) Olli Parviainen
-/// Author e-mail : oparviai 'at' iki.fi
-/// WWW           : http://www.surina.net
-///
-////////////////////////////////////////////////////////////////////////////////
-
 #include <jni.h>
 #include <android/log.h>
 #include <stdexcept>
@@ -35,8 +25,7 @@ using namespace soundtouch;
 
 
 // Set error message to return
-static void _setErrmsg(const char *msg)
-{
+static void _setErrmsg(const char *msg) {
 	_errMsg = msg;
 }
 
@@ -92,161 +81,242 @@ static int _init_threading(bool warn)
 #endif
 
 // Processes the sound file
-static void _processFile(SoundTouch *pSoundTouch, const char *inFileName, const char *outFileName)
-{
-    int nSamples;
-    int nChannels;
-    int buffSizeSamples;
-    SAMPLETYPE sampleBuffer[BUFF_SIZE];
+static void _processFile(SoundTouch *pSoundTouch, const char *inFileName, const char *outFileName) {
+	int nSamples;
+	int nChannels;
+	int buffSizeSamples;
+	SAMPLETYPE sampleBuffer[BUFF_SIZE];
 
-    // open input file
-    WavInFile inFile(inFileName);
-    int sampleRate = inFile.getSampleRate();
-    int bits = inFile.getNumBits();
-    nChannels = inFile.getNumChannels();
+	// open input file
+	WavInFile inFile(inFileName);
+	int sampleRate = inFile.getSampleRate();
+	int bits = inFile.getNumBits();
+	nChannels = inFile.getNumChannels();
 
-    // create output file
-    WavOutFile outFile(outFileName, sampleRate, bits, nChannels);
+	// create output file
+	WavOutFile outFile(outFileName, sampleRate, bits, nChannels);
 
-    pSoundTouch->setSampleRate(sampleRate);
-    pSoundTouch->setChannels(nChannels);
+	pSoundTouch->setSampleRate(sampleRate);
+	pSoundTouch->setChannels(nChannels);
 
-    assert(nChannels > 0);
-    buffSizeSamples = BUFF_SIZE / nChannels;
+	assert(nChannels > 0);
+	buffSizeSamples = BUFF_SIZE / nChannels;
 
-    // Process samples read from the input file
-    while (inFile.eof() == 0)
-    {
-        int num;
+	// Process samples read from the input file
+	while (inFile.eof() == 0) {
+		int num;
 
-        // Read a chunk of samples from the input file
-        num = inFile.read(sampleBuffer, BUFF_SIZE);
-        nSamples = num / nChannels;
+		// Read a chunk of samples from the input file
+		num = inFile.read(sampleBuffer, BUFF_SIZE);
+		nSamples = num / nChannels;
 
-        // Feed the samples into SoundTouch processor
-        pSoundTouch->putSamples(sampleBuffer, nSamples);
+		// Feed the samples into SoundTouch processor
+		pSoundTouch->putSamples(sampleBuffer, nSamples);
 
-        // Read ready samples from SoundTouch processor & write them output file.
-        // NOTES:
-        // - 'receiveSamples' doesn't necessarily return any samples at all
-        //   during some rounds!
-        // - On the other hand, during some round 'receiveSamples' may have more
-        //   ready samples than would fit into 'sampleBuffer', and for this reason
-        //   the 'receiveSamples' call is iterated for as many times as it
-        //   outputs samples.
-        do
-        {
-            nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
-            outFile.write(sampleBuffer, nSamples * nChannels);
-        } while (nSamples != 0);
-    }
+		// Read ready samples from SoundTouch processor & write them output file.
+		// NOTES:
+		// - 'receiveSamples' doesn't necessarily return any samples at all
+		//   during some rounds!
+		// - On the other hand, during some round 'receiveSamples' may have more
+		//   ready samples than would fit into 'sampleBuffer', and for this reason
+		//   the 'receiveSamples' call is iterated for as many times as it
+		//   outputs samples.
+		do {
+			nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
+			outFile.write(sampleBuffer, nSamples * nChannels);
+		} while (nSamples != 0);
+	}
 
-    // Now the input file is processed, yet 'flush' few last samples that are
-    // hiding in the SoundTouch's internal processing pipeline.
-    pSoundTouch->flush();
-    do
-    {
-        nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
-        outFile.write(sampleBuffer, nSamples * nChannels);
-    } while (nSamples != 0);
+	// Now the input file is processed, yet 'flush' few last samples that are
+	// hiding in the SoundTouch's internal processing pipeline.
+	pSoundTouch->flush();
+	do {
+		nSamples = pSoundTouch->receiveSamples(sampleBuffer, buffSizeSamples);
+		outFile.write(sampleBuffer, nSamples * nChannels);
+	} while (nSamples != 0);
+}
+
+static void
+_processSamples(JNIEnv *env, SoundTouch *ptr, jbyteArray data, jint size, jbyteArray out) {
+	int samples;
+	LOGV("JNI call soundtouch.navProcessBytes");
+	int channel = (int)ptr-> numChannels();
+	int bufferSize = size / channel; //可能是双声道，是一半
+	SAMPLETYPE sampleBuffer[size];
+
+	ptr->putSamples((SAMPLETYPE *) data, bufferSize); //一半
+
+	samples = ptr->receiveSamples(sampleBuffer, bufferSize);
+
+	env->SetByteArrayRegion(out, 0, samples * channel, (jbyte *) sampleBuffer);
+
+	LOGV("JNI call soundtouch.navProcessBytes END");
+}
+
+
+extern "C" DLL_PUBLIC jstring
+Java_me_shetj_ndk_soundtouch_SoundTouch_getVersionString(JNIEnv *env, jobject thiz) {
+	const char *verStr;
+
+	LOGV("JNI call SoundTouch.getVersionString");
+
+	// Call example SoundTouch routine
+	verStr = SoundTouch::getVersionString();
+
+	// gomp_tls storage bug workaround - see comments in _init_threading() function!
+	// update: apparently this is not needed any more with concurrent Android SDKs
+	// _init_threading(false);
+
+	int threads = 0;
+#pragma omp parallel
+	{
+#pragma omp atomic
+		threads++;
+	}
+	LOGV("JNI thread count %d", threads);
+
+	// return version as string
+	return env->NewStringUTF(verStr);
 }
 
 
 
-extern "C" DLL_PUBLIC jstring Java_me_shetj_ndk_soundtouch_SoundTouch_getVersionString(JNIEnv *env, jobject thiz)
-{
-    const char *verStr;
-
-    LOGV("JNI call SoundTouch.getVersionString");
-
-    // Call example SoundTouch routine
-    verStr = SoundTouch::getVersionString();
-
-    // gomp_tls storage bug workaround - see comments in _init_threading() function!
-    // update: apparently this is not needed any more with concurrent Android SDKs
-    // _init_threading(false);
-
-    int threads = 0;
-	#pragma omp parallel
-    {
-		#pragma omp atomic
-    	threads ++;
-    }
-    LOGV("JNI thread count %d", threads);
-
-    // return version as string
-    return env->NewStringUTF(verStr);
+extern "C" DLL_PUBLIC jlong
+Java_me_shetj_ndk_soundtouch_SoundTouch_newInstance(JNIEnv *env, jobject thiz) {
+	return (jlong) (new SoundTouch());
 }
 
 
-
-extern "C" DLL_PUBLIC jlong Java_me_shetj_ndk_soundtouch_SoundTouch_newInstance(JNIEnv *env, jobject thiz)
-{
-	return (jlong)(new SoundTouch());
-}
-
-
-extern "C" DLL_PUBLIC void Java_me_shetj_ndk_soundtouch_SoundTouch_deleteInstance(JNIEnv *env, jobject thiz, jlong handle)
-{
-	SoundTouch *ptr = (SoundTouch*)handle;
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_deleteInstance(JNIEnv *env, jobject thiz, jlong handle) {
+	SoundTouch *ptr = (SoundTouch *) handle;
 	delete ptr;
 }
 
-
-extern "C" DLL_PUBLIC void Java_me_shetj_ndk_soundtouch_SoundTouch_setTempo(JNIEnv *env, jobject thiz, jlong handle, jfloat tempo)
-{
-	SoundTouch *ptr = (SoundTouch*)handle;
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_init(JNIEnv *env, jobject thiz, jlong handle, jint channels,
+                                             jint sampleRate, jint tempo, jfloat pitch,
+                                             jfloat speed) {
+	SoundTouch *ptr = (SoundTouch *) handle;
+	ptr->setSampleRate(sampleRate);
+	ptr->setChannels(channels);
 	ptr->setTempo(tempo);
-}
-
-
-extern "C" DLL_PUBLIC void Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchSemiTones(JNIEnv *env, jobject thiz, jlong handle, jfloat pitch)
-{
-	SoundTouch *ptr = (SoundTouch*)handle;
 	ptr->setPitchSemiTones(pitch);
-}
-
-
-extern "C" DLL_PUBLIC void Java_me_shetj_ndk_soundtouch_SoundTouch_setSpeed(JNIEnv *env, jobject thiz, jlong handle, jfloat speed)
-{
-	SoundTouch *ptr = (SoundTouch*)handle;
+	ptr->setTempo(tempo);
 	ptr->setRate(speed);
 }
 
 
-extern "C" DLL_PUBLIC jstring Java_me_shetj_ndk_soundtouch_SoundTouch_getErrorString(JNIEnv *env, jobject thiz)
-{
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_setTempo(JNIEnv *env, jobject thiz, jlong handle,
+                                                 jfloat tempo) {
+	SoundTouch *ptr = (SoundTouch *) handle;
+	ptr->setTempo(tempo);
+}
+
+
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchSemiTones(JNIEnv *env, jobject thiz, jlong handle,
+                                                          jfloat pitch) {
+	SoundTouch *ptr = (SoundTouch *) handle;
+	ptr->setPitchSemiTones(pitch);
+}
+
+
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_setRate(JNIEnv *env, jobject thiz, jlong handle,
+                                                jfloat speed) {
+	SoundTouch *ptr = (SoundTouch *) handle;
+	ptr->setRate(speed);
+}
+
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_setRateChange(JNIEnv *env, jobject thiz, jlong handle,
+                                                      jfloat rateChange) {
+	SoundTouch *ptr = (SoundTouch *) handle;
+	ptr->setRateChange(rateChange);
+}
+
+
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_setTempoChange(JNIEnv *env, jobject thiz, jlong handle,
+                                                       jfloat newTempo) {
+	SoundTouch *ptr = (SoundTouch *) handle;
+	ptr->setTempoChange(newTempo);
+}
+
+extern "C" DLL_PUBLIC jstring
+Java_me_shetj_ndk_soundtouch_SoundTouch_getErrorString(JNIEnv *env, jobject thiz) {
 	jstring result = env->NewStringUTF(_errMsg.c_str());
 	_errMsg.clear();
 
 	return result;
 }
 
+extern "C" DLL_PUBLIC jint
+Java_me_shetj_ndk_soundtouch_SoundTouch_processSamples(JNIEnv *env, jobject thiz, jlong handle,
+                                                       jbyteArray input, jint samples,
+                                                       jbyteArray output) {
+	SoundTouch *ptr = (SoundTouch *) handle;
+	try {
+		_processSamples(env, ptr, input, samples, output);
+	}
+	catch (const runtime_error &e) {
+		const char *err = e.what();
+		// An exception occurred during processing, return the error message
+		LOGV("JNI exception in SoundTouch::_processSamples: %s", err);
+		_setErrmsg(err);
+		return -1;
+	}
+	return 0;
+}
 
-extern "C" DLL_PUBLIC int Java_me_shetj_ndk_soundtouch_SoundTouch_processFile(JNIEnv *env, jobject thiz, jlong handle, jstring jinputFile, jstring joutputFile)
-{
-	SoundTouch *ptr = (SoundTouch*)handle;
+extern "C" DLL_PUBLIC jint
+Java_me_shetj_ndk_soundtouch_SoundTouch_flush(JNIEnv *env, jobject thiz, jlong handle,
+                                              jbyteArray outArray) {
+	try {
+		SoundTouch *ptr = (SoundTouch *) handle;
+		ptr->flush(); //flush,然后处理最后的数据，可能处理不完，后续再测试一下，或者修改一下
+		int samples;
+		int channel = ptr->numChannels();
+		const jsize bufferSize = env->GetArrayLength(outArray);
+		SAMPLETYPE sampleBuffer[bufferSize];
+		samples = ptr->receiveSamples(sampleBuffer, bufferSize / channel);
+		env->SetByteArrayRegion(outArray, 0, samples * channel, (jbyte *) sampleBuffer);
+		return 0;
+	} catch (const runtime_error &e) {
+		const char *err = e.what();
+		// An exception occurred during processing, return the error message
+		LOGV("JNI exception in SoundTouch::processFile: %s", err);
+		_setErrmsg(err);
+		return -1;
+	}
+}
+
+
+extern "C" DLL_PUBLIC int
+Java_me_shetj_ndk_soundtouch_SoundTouch_processFile(JNIEnv *env, jobject thiz, jlong handle,
+                                                    jstring jinputFile, jstring joutputFile) {
+	SoundTouch *ptr = (SoundTouch *) handle;
 
 	const char *inputFile = env->GetStringUTFChars(jinputFile, 0);
 	const char *outputFile = env->GetStringUTFChars(joutputFile, 0);
 
 	LOGV("JNI process file %s", inputFile);
 
-    /// gomp_tls storage bug workaround - see comments in _init_threading() function!
-    if (_init_threading(true)) return -1;
+//    /// gomp_tls storage bug workaround - see comments in _init_threading() function!
+//    if (_init_threading(true)) return -1;
 
-	try
-	{
+	try {
 		_processFile(ptr, inputFile, outputFile);
 	}
-	catch (const runtime_error &e)
-    {
+	catch (const runtime_error &e) {
 		const char *err = e.what();
-        // An exception occurred during processing, return the error message
-    	LOGV("JNI exception in SoundTouch::processFile: %s", err);
-        _setErrmsg(err);
-        return -1;
-    }
+		// An exception occurred during processing, return the error message
+		LOGV("JNI exception in SoundTouch::processFile: %s", err);
+		_setErrmsg(err);
+		return -1;
+	}
 
 
 	env->ReleaseStringUTFChars(jinputFile, inputFile);
