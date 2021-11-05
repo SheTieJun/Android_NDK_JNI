@@ -12,7 +12,7 @@ extern "C" {
  * Method:    version
  * Signature: ()Ljava/lang/String;
  */
-JNIEXPORT jstring JNICALL Java_me_shetj_recorder_util_LameUtils_version
+JNIEXPORT jstring JNICALL Java_me_shetj_ndk_lamel_LameUtils_version_LameUtils_version
   (JNIEnv *, jclass);
 
 /*
@@ -20,7 +20,7 @@ JNIEXPORT jstring JNICALL Java_me_shetj_recorder_util_LameUtils_version
  * Method:    init
  * Signature: (IIIII)V
  */
-JNIEXPORT void JNICALL Java_me_shetj_recorder_util_LameUtils_init
+JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init
   (JNIEnv *, jclass, jint, jint, jint, jint, jint);
 
 /*
@@ -28,15 +28,15 @@ JNIEXPORT void JNICALL Java_me_shetj_recorder_util_LameUtils_init
  * Method:    encode
  * Signature: ([S[SI[B)I
  */
-JNIEXPORT jint JNICALL Java_me_shetj_recorder_util_LameUtils_encode
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encode
   (JNIEnv *, jclass, jshortArray, jshortArray, jint, jbyteArray);
 
 
-JNIEXPORT jint JNICALL Java_me_shetj_recorder_util_LameUtils_encodeInterleaved
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleaved
         (JNIEnv *, jclass, jshortArray, jshortArray, jint, jbyteArray);
 
 
-JNIEXPORT jint JNICALL Java_me_shetj_recorder_util_LameUtils_encodeByByte
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeByByte
         (JNIEnv *, jclass, jbyteArray, jbyteArray, jint, jbyteArray);
 
 /*
@@ -44,7 +44,7 @@ JNIEXPORT jint JNICALL Java_me_shetj_recorder_util_LameUtils_encodeByByte
  * Method:    flush
  * Signature: ([B)I
  */
-JNIEXPORT jint JNICALL Java_me_shetj_recorder_util_LameUtils_flush
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_flush
   (JNIEnv *, jclass, jbyteArray);
 
 /*
@@ -52,7 +52,7 @@ JNIEXPORT jint JNICALL Java_me_shetj_recorder_util_LameUtils_flush
  * Method:    close
  * Signature: ()V
  */
-JNIEXPORT void JNICALL Java_me_shetj_recorder_util_LameUtils_close
+JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_close
   (JNIEnv *, jclass);
 
 #ifdef __cplusplus

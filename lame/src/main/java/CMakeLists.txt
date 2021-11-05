@@ -1,5 +1,5 @@
 
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.10.2)
 
 #C 的编译选项是 CMAKE_C_FLAGS
 # 指定编译参数，可选

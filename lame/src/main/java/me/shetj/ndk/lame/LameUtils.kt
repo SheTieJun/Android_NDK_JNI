@@ -1,9 +1,11 @@
-package me.shetj.recorder.util
+package me.shetj.ndk.lame
 
 object LameUtils {
+
     init {
         System.loadLibrary("shetj_mp3lame")
     }
+
     external fun version(): String
 
     external fun init(

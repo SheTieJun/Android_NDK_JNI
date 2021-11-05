@@ -1,6 +1,15 @@
+## SoundTouch
+
+- soundtouch是一个音频处理库
+- soundtouch 的功能不是很强大 主要可以调整的参数只有2个：音速、音调
+
+- 官网(http://www.surina.net/soundtouch)
+- 下载地址(https://codeberg.org/soundtouch/soundtouch)
+
+
 ## SoundTouch公开函数与参数的说明
 - version:2.3.1
-
+[SoundTouch.cpp](src/main/cpp/soundtouch/SoundTouch.cpp)
 ### 采样：
 - [X] setChannels(int) 设置声道，1 = mono单声道, 2 = stereo立体声
 - [X] setSampleRate(uint) 设置采样率
@@ -23,11 +32,11 @@ setPitchOctaves(double) 在源pitch的基础上，使用八度音(Octave)设置�
 #### 变调不变速
 setPitch(double newPitch)
 setPitchOctaves(double newPitch)
-setPitchSemiTones(double or int newPitch)
+- [X] setPitchSemiTones(double or int newPitch)
 #### 变速不变调
 setRate(double newRate)
 - [X] setRateChange(double newRate)
-setTempo(double newTempo)
-setTempoChange(double newTempo) 在源tempo的基础上，以百分比设置新的tempo[-50,100]
+- [X] setTempo(double newTempo)
+- [X] setTempoChange(double newTempo) 在源tempo的基础上，以百分比设置新的tempo[-50,100]
 ### SoundTouch实时处理音频流
 - [X] ST对音频的处理是输入函数putSamples()与输出函数receiveSamples()。实时处理音频流的思路就是，循环读取音频数据段，放入ST进行输出，输出处理后的数据段用于播放。
