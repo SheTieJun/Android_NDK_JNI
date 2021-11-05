@@ -1,7 +1,7 @@
 ## SoundTouch
 
 - soundtouch是一个音频处理库
-- soundtouch 的功能不是很强大 主要可以调整的参数只有2个：音速、音调
+- soundtouch 的主要功能功能：变音。  通过：音速、音调
 
 - 官网(http://www.surina.net/soundtouch)
 - 下载地址(https://codeberg.org/soundtouch/soundtouch)
