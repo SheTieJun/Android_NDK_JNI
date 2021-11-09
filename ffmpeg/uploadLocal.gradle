@@ -1,0 +1,15 @@
+apply plugin: 'maven-publish'
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId local_group_id
+                from components.release
+                artifactId = 'ffmpeg'
+                version = sdk_version
+            }
+        }
+    }
+}
+

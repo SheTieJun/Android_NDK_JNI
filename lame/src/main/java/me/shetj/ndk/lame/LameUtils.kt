@@ -45,6 +45,12 @@ object LameUtils {
         mp3buf: ByteArray
     ): Int
 
+    external fun encodeInterleavedByByte(
+        pcm: ByteArray,
+        samples: Int,
+        mp3buf: ByteArray
+    ): Int
+
     external fun flush(mp3buf: ByteArray): Int
     external fun close()
 }

@@ -88,6 +88,31 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleaved(
 
 }
 
+
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleavedByByte(
+		JNIEnv  *env,
+		jclass cls,
+		jbyteArray pcm_buffer,
+		jint samples,
+		jbyteArray mp3buf){
+
+	//把Java传过来参数转成C中的参数进行修改
+	jbyte * j_pcm_buffer =(*env)->GetByteArrayElements(env,pcm_buffer,NULL);
+
+	const jsize mp3buf_size = (*env) ->GetArrayLength(env,mp3buf);
+
+	jbyte* j_mp3buff = (*env) ->GetByteArrayElements(env,mp3buf,NULL);
+
+	int result =  lame_encode_buffer_interleaved(lame,(const short *)j_pcm_buffer,samples/2,j_mp3buff,mp3buf_size);
+
+	//释放参数
+	(*env)->ReleaseShortArrayElements(env,pcm_buffer,j_pcm_buffer,0);
+	(*env)->ReleaseByteArrayElements(env,mp3buf,j_mp3buff,0);
+	return result;
+
+}
+
+
 JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeByByte(
 		JNIEnv  *env,
 		jclass cls,
@@ -104,7 +129,7 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeByByte(
 
 	jbyte* j_mp3buff = (*env) ->GetByteArrayElements(env,mp3buf,NULL);
 
-	int result = lame_encode_buffer(lame, (const short *) j_buff_left, (const short *) j_buff_right, samples, j_mp3buff, mp3buf_size);
+	int result = lame_encode_buffer(lame, (const short *) j_buff_left, (const short *) j_buff_right, samples/2, j_mp3buff, mp3buf_size);
 
 	//释放参数
 	(*env)->ReleaseByteArrayElements(env,buffer_left,j_buff_left,0);

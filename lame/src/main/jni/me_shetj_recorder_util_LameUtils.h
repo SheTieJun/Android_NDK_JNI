@@ -39,6 +39,10 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleaved
 JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeByByte
         (JNIEnv *, jclass, jbyteArray, jbyteArray, jint, jbyteArray);
 
+
+
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleavedByByte
+        (JNIEnv *, jclass, jshortArray, jshortArray, jint, jbyteArray);
 /*
  * Class:     me_shetj_recorder_util_LameUtils
  * Method:    flush
@@ -54,6 +58,9 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_flush
  */
 JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_close
   (JNIEnv *, jclass);
+
+
+
 
 #ifdef __cplusplus
 }

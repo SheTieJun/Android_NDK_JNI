@@ -49,7 +49,7 @@ interface ISoundTouch {
         input: ByteArray?,
         samples: Int,
         output: ByteArray?,
-    )
+    ):Int
 
     //获取最后一段数据
     fun flush(mp3buf: ByteArray): Int
