@@ -34,15 +34,14 @@ class SoundTouch {
     external fun processFile(inputFile: String, outputFile: String): Int
 
 
-    //实时处理PCM 流
-    external fun processSamples(
-        input: ByteArray?,
-        samples: Int,
-        output: ByteArray?,
-    ): Int
+    //putSamples 的次数可能小于receiveSamples
+    external fun putSamples(samples: ShortArray, len: Int)
+    external fun receiveSamples(outputBuf: ShortArray): Int
+
+
 
     //获取最后一段数据
-    external fun flush(mp3buf: ByteArray): Int
+    external fun flush(mp3buf: ShortArray): Int
 
 
 }

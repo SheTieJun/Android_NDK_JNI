@@ -12,9 +12,6 @@ class STKit : ISoundTouch {
 
     companion object {
 
-        init {
-            System.loadLibrary("soundTouch")
-        }
 
         @Volatile
         private var sInstance: STKit? = null
@@ -32,8 +29,7 @@ class STKit : ISoundTouch {
 
     }
 
-    private val soundTouch :SoundTouch by lazy { SoundTouch() }
-
+    private val soundTouch: SoundTouch by lazy { SoundTouch() }
 
 
     private var handle: Long = 0
@@ -44,8 +40,8 @@ class STKit : ISoundTouch {
             handle = soundTouch.newInstance()
         }
         Log.e(
-            "SoundTouch",
-            "handle:${handle},init:channels: $channels, sampleRate: $sampleRate, tempo: $tempo, " +
+            "soundTouch",
+            "version:${soundTouch.getVersionString()}handle:${handle},init:channels: $channels, sampleRate: $sampleRate, tempo: $tempo, " +
                     "pitch: $pitch, rate: $rate"
         )
         soundTouch.init(channels, sampleRate, tempo, pitch, rate)
@@ -60,19 +56,9 @@ class STKit : ISoundTouch {
     }
 
 
-    override fun processSamples(input: ByteArray?, samples: Int, output: ByteArray?): Int {
-        //0 表示没有数据，- 1 表示错误
-        val processSamples = soundTouch.processSamples(input, samples, output)
-        Log.e("SoundTouch","processSamples:$processSamples")
-        if (processSamples <= 0) {
-            Log.e("SoundTouch", soundTouch.getErrorString())
-        }
-        return processSamples
-    }
-
     //处理玩最后的数据
-    override fun flush(mp3buf: ByteArray): Int {
-        return  soundTouch.flush(mp3buf)
+    override fun flush(mp3buf: ShortArray): Int {
+        return soundTouch.flush(mp3buf)
     }
 
     override fun close() {
@@ -98,12 +84,19 @@ class STKit : ISoundTouch {
     }
 
     override fun processFile(inputFile: String, outputFile: String): Boolean {
-        return if ( soundTouch.processFile(inputFile, outputFile) == 0) {
+        return if (soundTouch.processFile(inputFile, outputFile) == 0) {
             true
         } else {
-            Log.e("SoundTouch",  soundTouch.getErrorString())
+            Log.e("soundTouch", soundTouch.getErrorString())
             false
         }
     }
 
+    override fun receiveSamples(outputBuf: ShortArray): Int {
+        return soundTouch.receiveSamples(outputBuf)
+    }
+
+    override fun putSamples(samples: ShortArray, len: Int) {
+        soundTouch.putSamples(samples, len)
+    }
 }

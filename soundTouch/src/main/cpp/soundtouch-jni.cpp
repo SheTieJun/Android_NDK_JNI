@@ -140,12 +140,12 @@ static void _processFile(SoundTouch *pSoundTouch, const char *inFileName, const 
 static jint _processSamples(JNIEnv *env, jbyteArray data, jint size, jbyteArray outbuf) {
     int samples;
     int channel = pSoundTouch->numChannels();
-    int bufferSize = size / channel; //可能是双声道，是一半
+    int bufferSize = size / (channel * 2); //可能是双声道，是一半
     SAMPLETYPE sampleBuffer[size];
-	pSoundTouch->putSamples((SAMPLETYPE *) data, bufferSize); //一半
+    pSoundTouch->putSamples((SAMPLETYPE *) data, bufferSize);
     samples = pSoundTouch->receiveSamples(sampleBuffer, bufferSize);
     env->SetByteArrayRegion(outbuf, 0, samples * channel, (jbyte *) sampleBuffer);
-    return samples;
+    return samples * channel;
 }
 
 
@@ -208,38 +208,38 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_init(JNIEnv *env, jobject thiz, jint cha
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setTempo(JNIEnv *env, jobject thiz,
                                                  jfloat tempo) {
-	if (pSoundTouch == NULL) {
-		return;
-	}
-	pSoundTouch->setTempo(tempo);
+    if (pSoundTouch == NULL) {
+        return;
+    }
+    pSoundTouch->setTempo(tempo);
 }
 
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchSemiTones(JNIEnv *env, jobject thiz,
                                                           jfloat pitch) {
-	if (pSoundTouch == NULL) {
-		return;
-	}
-	pSoundTouch->setPitchSemiTones(pitch);
+    if (pSoundTouch == NULL) {
+        return;
+    }
+    pSoundTouch->setPitchSemiTones(pitch);
 }
 
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setRate(JNIEnv *env, jobject thiz,
                                                 jfloat speed) {
-	if (pSoundTouch == NULL) {
-		return;
-	}
+    if (pSoundTouch == NULL) {
+        return;
+    }
     pSoundTouch->setRate(speed);
 }
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setRateChange(JNIEnv *env, jobject thiz,
                                                       jfloat rateChange) {
-	if (pSoundTouch == NULL) {
-		return;
-	}
+    if (pSoundTouch == NULL) {
+        return;
+    }
     pSoundTouch->setRateChange(rateChange);
 }
 
@@ -247,9 +247,9 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_setRateChange(JNIEnv *env, jobject thiz,
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setTempoChange(JNIEnv *env, jobject thiz,
                                                        jfloat newTempo) {
-	if (pSoundTouch == NULL) {
-		return;
-	}
+    if (pSoundTouch == NULL) {
+        return;
+    }
     pSoundTouch->setTempoChange(newTempo);
 }
 
@@ -261,38 +261,71 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_getErrorString(JNIEnv *env, jobject thiz
     return result;
 }
 
-extern "C" DLL_PUBLIC jint
-Java_me_shetj_ndk_soundtouch_SoundTouch_processSamples(JNIEnv *env, jobject thiz,
-                                                       jbyteArray input, jint samples,
-                                                       jbyteArray output) {
-    LOGV("JNI processSamples");
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_putSamples(JNIEnv *env, jobject thiz,
+                                                   jshortArray samples, jint size) {
+
     try {
-        return _processSamples(env,input, samples, output);
+        jboolean isArrayCopied = false;
+        jshort *samplesArray = env->GetShortArrayElements(samples, &isArrayCopied);
+
+        pSoundTouch->putSamples((SAMPLETYPE *) samplesArray, (uint) size);
+
+        if (isArrayCopied) {
+            env->ReleaseShortArrayElements(samples, samplesArray, 0);
+        }
     }
     catch (const runtime_error &e) {
         const char *err = e.what();
         // An exception occurred during processing, return the error message
-        LOGV("JNI exception in SoundTouch::_processSamples: %s", err);
+        LOGV("JNI exception in SoundTouch::putSamples: %s", err);
         _setErrmsg(err);
-        return -1;
     }
 }
 
 extern "C" DLL_PUBLIC jint
-Java_me_shetj_ndk_soundtouch_SoundTouch_flush(JNIEnv *env, jobject thiz,
-                                              jbyteArray outArray) {
+Java_me_shetj_ndk_soundtouch_SoundTouch_receiveSamples(JNIEnv *env, jobject thiz,
+                                                       jshortArray output) {
+
     try {
-		if (pSoundTouch == NULL) {
+        jboolean isArrayCopied = false;
+        const jsize buf_size = env->GetArrayLength(output);
+        jshort *samplesArray = env->GetShortArrayElements(output, &isArrayCopied);
+        int nSamples = pSoundTouch->receiveSamples((SAMPLETYPE *) samplesArray, (uint) buf_size);
+        if (nSamples == 0) {
+            return 0;
+        }
+        if (isArrayCopied) {
+            env->ReleaseShortArrayElements(output, samplesArray, 0);
+        }
+        return nSamples;
+    }
+    catch (const runtime_error &e) {
+        const char *err = e.what();
+        // An exception occurred during processing, return the error message
+        LOGV("JNI exception in SoundTouch::receiveSamples: %s", err);
+        _setErrmsg(err);
+        return 0;
+    }
+
+}
+
+extern "C" DLL_PUBLIC jint
+Java_me_shetj_ndk_soundtouch_SoundTouch_flush(JNIEnv *env, jobject thiz,
+                                              jshortArray outArray) {
+    try {
+        if (pSoundTouch == NULL) {
             _setErrmsg("SoundTouch is NULL , u should init first");
-			return -1;
-		}
-		pSoundTouch->flush(); //flush,然后处理最后的数据，可能处理不完，后续再测试一下，或者修改一下
-        int samples;
-        int channel = pSoundTouch->numChannels();
-        const jsize bufferSize = env->GetArrayLength(outArray);
-        SAMPLETYPE sampleBuffer[bufferSize];
-        samples = pSoundTouch->receiveSamples(sampleBuffer, bufferSize / channel);
-        env->SetByteArrayRegion(outArray, 0, samples * channel, (jbyte *) sampleBuffer);
+            return -1;
+        }
+        pSoundTouch->flush(); //flush,然后处理最后的数据，可能处理不完，后续再测试一下，或者修改一下
+        SAMPLETYPE sampleBuffer[BUFF_SIZE];
+        int nSamples =  pSoundTouch->receiveSamples(sampleBuffer, BUFF_SIZE);
+
+        // 局部引用，创建一个short数组
+        jshortArray receiveSamples = env->NewShortArray(nSamples);
+        // 给short数组设置值
+        env->SetShortArrayRegion(outArray, 0, nSamples, (jshort *) sampleBuffer);
         return 0;
     } catch (const runtime_error &e) {
         const char *err = e.what();
@@ -307,10 +340,10 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_flush(JNIEnv *env, jobject thiz,
 extern "C" DLL_PUBLIC int
 Java_me_shetj_ndk_soundtouch_SoundTouch_processFile(JNIEnv *env, jobject thiz,
                                                     jstring jinputFile, jstring joutputFile) {
-	if (pSoundTouch == NULL) {
+    if (pSoundTouch == NULL) {
         _setErrmsg("SoundTouch is NULL , u should init first");
-		return -1;
-	}
+        return -1;
+    }
 
     const char *inputFile = env->GetStringUTFChars(jinputFile, 0);
     const char *outputFile = env->GetStringUTFChars(joutputFile, 0);
