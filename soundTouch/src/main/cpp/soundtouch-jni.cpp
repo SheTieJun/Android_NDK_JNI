@@ -268,8 +268,9 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_putSamples(JNIEnv *env, jobject thiz,
     try {
         jboolean isArrayCopied = false;
         jshort *samplesArray = env->GetShortArrayElements(samples, &isArrayCopied);
+        int channel = pSoundTouch->numChannels();
 
-        pSoundTouch->putSamples((SAMPLETYPE *) samplesArray, (uint) size);
+        pSoundTouch->putSamples((SAMPLETYPE *) samplesArray, size/channel);
 
         if (isArrayCopied) {
             env->ReleaseShortArrayElements(samples, samplesArray, 0);
@@ -290,15 +291,16 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_receiveSamples(JNIEnv *env, jobject thiz
     try {
         jboolean isArrayCopied = false;
         const jsize buf_size = env->GetArrayLength(output);
+        int channel = pSoundTouch->numChannels();
         jshort *samplesArray = env->GetShortArrayElements(output, &isArrayCopied);
-        int nSamples = pSoundTouch->receiveSamples((SAMPLETYPE *) samplesArray, (uint) buf_size);
+        int nSamples = pSoundTouch->receiveSamples((SAMPLETYPE *) samplesArray,buf_size/channel);
         if (nSamples == 0) {
             return 0;
         }
         if (isArrayCopied) {
             env->ReleaseShortArrayElements(output, samplesArray, 0);
         }
-        return nSamples;
+        return nSamples*channel;
     }
     catch (const runtime_error &e) {
         const char *err = e.what();
@@ -319,13 +321,6 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_flush(JNIEnv *env, jobject thiz,
             return -1;
         }
         pSoundTouch->flush(); //flush,然后处理最后的数据，可能处理不完，后续再测试一下，或者修改一下
-        SAMPLETYPE sampleBuffer[BUFF_SIZE];
-        int nSamples =  pSoundTouch->receiveSamples(sampleBuffer, BUFF_SIZE);
-
-        // 局部引用，创建一个short数组
-        jshortArray receiveSamples = env->NewShortArray(nSamples);
-        // 给short数组设置值
-        env->SetShortArrayRegion(outArray, 0, nSamples, (jshort *) sampleBuffer);
         return 0;
     } catch (const runtime_error &e) {
         const char *err = e.what();

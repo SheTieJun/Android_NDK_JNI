@@ -1,5 +1,7 @@
 ## Android NDK
 
+当前相关开发主要是为[Mp3Recorder](https://github.com/SheTieJun/Mp3Recorder) 服务
+
 ### [LAME](lame)
 
 - Lame官网（lame.sourceforge.io/index.php）

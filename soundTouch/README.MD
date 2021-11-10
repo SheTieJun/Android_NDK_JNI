@@ -7,6 +7,8 @@
 - 下载地址(https://codeberg.org/soundtouch/soundtouch)
 
 
+### [Mp3Recorder](https://github.com/SheTieJun/Mp3Recorder)-recorder-st
+
 ## SoundTouch公开函数与参数的说明
 - version:2.3.1
 [SoundTouch.cpp](src/main/cpp/soundtouch/SoundTouch.cpp)
@@ -54,11 +56,13 @@ setRate(double newRate)
 
     //指定播放速率
     fun setRate(speed: Float)
+
     //一般用来设置倍速，我们变音，默认 1.0就好
     fun setTempo(tempo: Float)
 
     //在原速1.0基础上，按百分比做增量，取值(-50 .. +100 %)
     fun setRateChange(@FloatRange(from = -50.0, to = 100.0) rateChange: Float)
+
     //在原速1.0基础上 源tempo=1.0，小于1则变慢；大于1变快 tempo (-50 .. +100 %)
     fun setTempoChange(@FloatRange(from = -50.0, to = 100.0) tempoChange: Float)
 
@@ -73,14 +77,12 @@ setRate(double newRate)
     fun processFile(inputFile: String, outputFile: String): Boolean
 
     //实时处理PCM 流
-    fun processSamples(
-        input: ByteArray?,
-        samples: Int,
-        output: ByteArray?,
-    )
+    fun putSamples(samples: ShortArray, len: Int)
+
+    fun receiveSamples(outputBuf: ShortArray): Int
 
     //获取最后一段数据
-    fun flush(mp3buf: ByteArray): Int
+    fun flush(mp3buf: ShortArray): Int
 
     fun close()
 ```
