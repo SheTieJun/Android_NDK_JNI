@@ -2,9 +2,6 @@ package me.shetj.sdk.ffmepg.demo
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.TextView
-import me.shetj.ndk.soundtouch.SoundTouch
-import me.shetj.sdk.ffmepg.FFmpegKit
 import me.shetj.sdk.ffmepg.demo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
         // Example of a call to a native method
         try {
-            SoundTouch.getInstance().init(1,44100,1,10f,1f)
+            STKit.getInstance().init(1,44100,1f,10f,1f)
             binding.sampleText.text = stringFromJNI()
         }catch (e:Exception){
             e.printStackTrace()

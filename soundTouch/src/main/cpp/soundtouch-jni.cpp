@@ -80,7 +80,6 @@ static int _init_threading(bool warn)
 
 #endif
 
-static SoundTouch *pSoundTouch = NULL;
 
 // Processes the sound file
 static void _processFile(SoundTouch *pSoundTouch, const char *inFileName, const char *outFileName) {
@@ -137,7 +136,8 @@ static void _processFile(SoundTouch *pSoundTouch, const char *inFileName, const 
     } while (nSamples != 0);
 }
 
-static jint _processSamples(JNIEnv *env, jbyteArray data, jint size, jbyteArray outbuf) {
+static jint _processSamples(JNIEnv *env,jlong handle, jbyteArray data, jint size, jbyteArray outbuf) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     int samples;
     int channel = pSoundTouch->numChannels();
     int bufferSize = size / (channel * 2); //可能是双声道，是一半
@@ -178,24 +178,23 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_getVersionString(JNIEnv *env, jobject th
 
 extern "C" DLL_PUBLIC jlong
 Java_me_shetj_ndk_soundtouch_SoundTouch_newInstance(JNIEnv *env, jobject thiz) {
-    pSoundTouch = new SoundTouch();
-    return 1;
+    SoundTouch *pSoundTouch  = new SoundTouch();
+    return  (jlong)(pSoundTouch);
 }
 
 
 extern "C" DLL_PUBLIC void
-Java_me_shetj_ndk_soundtouch_SoundTouch_deleteInstance(JNIEnv *env, jobject thiz) {
+Java_me_shetj_ndk_soundtouch_SoundTouch_deleteInstance(JNIEnv *env, jobject thiz,jlong handle) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     delete pSoundTouch;
-    pSoundTouch = NULL;
 }
 
 extern "C" DLL_PUBLIC void
-Java_me_shetj_ndk_soundtouch_SoundTouch_init(JNIEnv *env, jobject thiz, jint channels,
-                                             jint sampleRate, jint tempo, jfloat pitch,
+Java_me_shetj_ndk_soundtouch_SoundTouch_init(JNIEnv *env, jobject thiz,jlong handle, jint channels,
+                                             jint sampleRate, jfloat tempo, jfloat pitch,
                                              jfloat speed) {
-    if (pSoundTouch == NULL) {
-        pSoundTouch = new SoundTouch();
-    }
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
+    pSoundTouch->clear();
     pSoundTouch->setSampleRate(sampleRate);
     pSoundTouch->setChannels(channels);
     pSoundTouch->setTempo(tempo);
@@ -207,49 +206,39 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_init(JNIEnv *env, jobject thiz, jint cha
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setTempo(JNIEnv *env, jobject thiz,
-                                                 jfloat tempo) {
-    if (pSoundTouch == NULL) {
-        return;
-    }
+                                                 jlong handle,  jfloat tempo) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     pSoundTouch->setTempo(tempo);
 }
 
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchSemiTones(JNIEnv *env, jobject thiz,
-                                                          jfloat pitch) {
-    if (pSoundTouch == NULL) {
-        return;
-    }
+                                                          jlong handle, jfloat pitch) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     pSoundTouch->setPitchSemiTones(pitch);
 }
 
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setRate(JNIEnv *env, jobject thiz,
-                                                jfloat speed) {
-    if (pSoundTouch == NULL) {
-        return;
-    }
+                                                jlong handle, jfloat speed) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     pSoundTouch->setRate(speed);
 }
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setRateChange(JNIEnv *env, jobject thiz,
-                                                      jfloat rateChange) {
-    if (pSoundTouch == NULL) {
-        return;
-    }
+                                                      jlong handle,  jfloat rateChange) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     pSoundTouch->setRateChange(rateChange);
 }
 
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setTempoChange(JNIEnv *env, jobject thiz,
-                                                       jfloat newTempo) {
-    if (pSoundTouch == NULL) {
-        return;
-    }
+                                                       jlong handle,   jfloat newTempo) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     pSoundTouch->setTempoChange(newTempo);
 }
 
@@ -263,9 +252,10 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_getErrorString(JNIEnv *env, jobject thiz
 
 extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_putSamples(JNIEnv *env, jobject thiz,
-                                                   jshortArray samples, jint size) {
+                                                   jlong handle,  jshortArray samples, jint size) {
 
     try {
+        SoundTouch *pSoundTouch = (SoundTouch*)handle;
         jboolean isArrayCopied = false;
         jshort *samplesArray = env->GetShortArrayElements(samples, &isArrayCopied);
         int channel = pSoundTouch->numChannels();
@@ -286,9 +276,10 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_putSamples(JNIEnv *env, jobject thiz,
 
 extern "C" DLL_PUBLIC jint
 Java_me_shetj_ndk_soundtouch_SoundTouch_receiveSamples(JNIEnv *env, jobject thiz,
-                                                       jshortArray output) {
+                                                       jlong handle,  jshortArray output) {
 
     try {
+        SoundTouch *pSoundTouch = (SoundTouch*)handle;
         jboolean isArrayCopied = false;
         const jsize buf_size = env->GetArrayLength(output);
         int channel = pSoundTouch->numChannels();
@@ -314,8 +305,9 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_receiveSamples(JNIEnv *env, jobject thiz
 
 extern "C" DLL_PUBLIC jint
 Java_me_shetj_ndk_soundtouch_SoundTouch_flush(JNIEnv *env, jobject thiz,
-                                              jshortArray outArray) {
+                                              jlong handle,  jshortArray outArray) {
     try {
+        SoundTouch *pSoundTouch = (SoundTouch*)handle;
         if (pSoundTouch == NULL) {
             _setErrmsg("SoundTouch is NULL , u should init first");
             return -1;
@@ -334,7 +326,8 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_flush(JNIEnv *env, jobject thiz,
 
 extern "C" DLL_PUBLIC int
 Java_me_shetj_ndk_soundtouch_SoundTouch_processFile(JNIEnv *env, jobject thiz,
-                                                    jstring jinputFile, jstring joutputFile) {
+                                                    jlong handle,  jstring jinputFile, jstring joutputFile) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
     if (pSoundTouch == NULL) {
         _setErrmsg("SoundTouch is NULL , u should init first");
         return -1;
