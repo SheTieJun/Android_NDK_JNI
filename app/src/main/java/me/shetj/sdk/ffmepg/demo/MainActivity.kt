@@ -1,7 +1,8 @@
 package me.shetj.sdk.ffmepg.demo
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import me.shetj.ndk.lame.LameUtils
 import me.shetj.sdk.ffmepg.demo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -18,7 +19,10 @@ class MainActivity : AppCompatActivity() {
         // Example of a call to a native method
         try {
             STKit.getInstance().init(1,44100,1f,10f,1f)
-            binding.sampleText.text = stringFromJNI()
+            LameUtils.init(44100,1,44100,44,3)
+            binding.sampleText.text = stringFromJNI() +
+                    "\nLame:"+LameUtils.version() +
+                    "\nSoundTouch:${ STKit.getInstance().getVersion()}"
         }catch (e:Exception){
             e.printStackTrace()
         }

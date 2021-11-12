@@ -100,4 +100,8 @@ class STKit : ISoundTouch {
     override fun putSamples(samples: ShortArray, len: Int) {
         soundTouch.putSamples(handle,samples, len)
     }
+
+    fun getVersion(): String {
+        return soundTouch.getVersionString()
+    }
 }

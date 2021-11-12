@@ -19,6 +19,12 @@ object LameUtils {
     /**
      * 如果单声道使用该方法
      * samples =bufferLeft.size
+     *
+     * @return      number of bytes output in mp3buf. Can be 0
+     *                 -1:  mp3buf was too small
+     *                 -2:  malloc() problem
+     *                 -3:  lame_init_params() not called
+     *                 -4:  psycho acoustic problems
      */
     external fun encode(
         bufferLeft: ShortArray,
@@ -30,6 +36,11 @@ object LameUtils {
     /**
      * 双声道使用该方法
      * samples = pcm.size/2
+     * @return      number of bytes output in mp3buf. Can be 0
+     *                 -1:  mp3buf was too small
+     *                 -2:  malloc() problem
+     *                 -3:  lame_init_params() not called
+     *                 -4:  psycho acoustic problems
      */
     external fun encodeInterleaved(
         pcm: ShortArray,

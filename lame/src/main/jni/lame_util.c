@@ -10,7 +10,7 @@ static lame_global_flags *lame =NULL;
 JNIEXPORT jstring JNICALL Java_me_shetj_ndk_lame_LameUtils_version(
 		JNIEnv *env,
 		jclass jcls){
-	return (*env)->NewStringUTF(env,"3.100");
+		return (*env)->NewStringUTF(env,get_lame_version());
 };
 
 
