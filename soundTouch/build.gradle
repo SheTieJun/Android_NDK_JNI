@@ -52,6 +52,19 @@ android {
             jni.srcDirs=['src/main/cpp']
         }
     }
+
+    buildFeatures {
+        prefabPublishing true
+    }
+
+    prefab {
+        soundTouch {
+            headers "src/main/cpp/soundtouch"
+        }
+    }
+    packagingOptions {
+        exclude("**/libsoundTouch.so")
+    }
 }
 
 dependencies {
