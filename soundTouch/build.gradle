@@ -53,18 +53,18 @@ android {
         }
     }
 
-    buildFeatures {
-        prefabPublishing true
-    }
-
-    prefab {
-        soundTouch {
-            headers "src/main/cpp/soundtouch"
-        }
-    }
-    packagingOptions {
-        exclude("**/libsoundTouch.so")
-    }
+//    buildFeatures {
+//        prefabPublishing true
+//    }
+//
+//    prefab {
+//        soundTouch {
+//            headers "src/main/cpp/soundtouch"
+//        }
+//    }
+//    packagingOptions {
+//        exclude("**/libsoundTouch.so")
+//    }
 }
 
 dependencies {

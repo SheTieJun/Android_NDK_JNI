@@ -13,7 +13,7 @@ extern "C"
 #include "curl/curl.h"
 
 JNIEXPORT jstring JNICALL
-Java_me_shetj_sdk_curl_CUrlKit_downloadUrl(JNIEnv *env, jobject obj, jstring url) {
+Java_me_shetj_sdk_curl_CUrlKit_getVersion(JNIEnv *env, jobject obj) {
     curl_version_info_data *ver = curl_version_info(CURLVERSION_NOW);
 //    CURL *curl = curl_easy_init();
 //    if(curl) {

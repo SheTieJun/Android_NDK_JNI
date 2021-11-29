@@ -15,5 +15,7 @@ class CUrlKit {
         }
     }
 
-    external fun downloadUrl(url: String?): String
+    external fun getVersion(): String
+
+
 }

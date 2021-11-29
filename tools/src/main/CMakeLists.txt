@@ -47,7 +47,9 @@ find_package(curl REQUIRED CONFIG)
 
 find_package(jsoncpp REQUIRED CONFIG)
 
+find_package(soundTouch REQUIRED CONFIG)
+
 set_target_properties(toolsCurl PROPERTIES CXX_STANDARD 17)
 target_compile_options(toolsCurl PRIVATE -Wall -Werror)
 
-target_link_libraries(toolsCurl ${log-lib} curl::curl jsoncpp::jsoncpp)
+target_link_libraries(toolsCurl ${log-lib} curl::curl jsoncpp::jsoncpp )
