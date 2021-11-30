@@ -15,13 +15,14 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/libs/${ANDROID_ABI})
 # 1. 定义so库和头文件所在目录，方面后面使用
 set(curl_lib ${PROJECT_SOURCE_DIR}/libs/${ANDROID_ABI})
 
+
 ##当前 cpp目录的所有.c .cpp源文件,并且赋值到SRC_LIST
-include_directories(${PROJECT_SOURCE_DIR}/cpp/include)
-
-MESSAGE(STATUS "curl_lib path = ${curl_lib}")
+AUX_SOURCE_DIRECTORY(cpp/curl SRC_LIST_CURL)
 
 
+include_directories(${PROJECT_SOURCE_DIR}/cpp/curl)
 
+add_definitions(-DDEBUG)
 
 add_library( # Sets the name of the library.
         toolsCurl
@@ -30,7 +31,7 @@ add_library( # Sets the name of the library.
         SHARED
 
         # Provides a relative path to your source file(s).
-        ${PROJECT_SOURCE_DIR}/cpp/curl/Curl-lib.cpp
+        ${SRC_LIST_CURL}
         )
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -46,8 +47,6 @@ find_library(
 find_package(curl REQUIRED CONFIG)
 
 find_package(jsoncpp REQUIRED CONFIG)
-
-find_package(soundTouch REQUIRED CONFIG)
 
 set_target_properties(toolsCurl PROPERTIES CXX_STANDARD 17)
 target_compile_options(toolsCurl PRIVATE -Wall -Werror)
