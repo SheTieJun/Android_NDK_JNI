@@ -12,11 +12,11 @@ import java.io.File
 object CurlHttp {
 
     fun initCurl(){
-        CUrlKit.init()
+//        CUrlKit.init()
     }
 
     fun cleanUp(){
-        CUrlKit.cleanup()
+//        CUrlKit.cleanup()
     }
 
     fun testGet(): String {

@@ -28,13 +28,9 @@ size_t PostDispose(char *buffer, size_t size, size_t nmemb, void *userdata) {
 extern "C" JNIEXPORT jstring JNICALL
 Java_me_shetj_sdk_curl_CUrlKit_getVersion(JNIEnv *env, jclass obj) {
     curl_version_info_data *ver = curl_version_info(CURLVERSION_NOW);
-    LOGI("libcurl version %d.%d.%d\n"
-         "ssl = %s",
-         (ver->version_num >> 16) & 0xff,
-         (ver->version_num >> 8) & 0xff,
-         ver->version_num & 0xff,
-         ver->ssl_version);
-    return env->NewStringUTF("libcurl version");
+    return env->NewStringUTF(("libcurl version" + to_string((ver->version_num >> 16) & 0xff) +"."+
+                             to_string((ver->version_num >> 8) & 0xff) +"."+
+                             to_string(ver->version_num & 0xff)).c_str());
 }
 
 
@@ -60,13 +56,13 @@ Java_me_shetj_sdk_curl_CUrlKit_postJson(JNIEnv *env, jobject thiz, jstring url, 
 extern "C" JNIEXPORT jstring JNICALL
 Java_me_shetj_sdk_curl_CUrlKit_get(JNIEnv *env, jobject thiz, jstring url) {
     string buf;
-    CURLcode res =  CurlTools::HttpGet(utils::jString2String(env, url), buf, 300);
-    if(res == CURLE_OK){
-        LOGI("HttpGet:%s",buf.c_str());
+    CURLcode res = CurlTools::HttpGet(utils::jString2String(env, url), buf, 300);
+    if (res == CURLE_OK) {
+        LOGI("HttpGet:%s", buf.c_str());
         return env->NewStringUTF(buf.c_str());
-    }else{
+    } else {
         LOGE("HttpGet error code:%d", res);
-        return env->NewStringUTF(("HttpGet error code:"+to_string(res)).c_str());
+        return env->NewStringUTF(("HttpGet error code:" + to_string(res)).c_str());
     }
 
 }
