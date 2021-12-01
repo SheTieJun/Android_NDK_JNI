@@ -1,5 +1,6 @@
 package me.shetj.sdk.curl
 
+import android.util.Log
 import java.io.File
 
 /**
@@ -11,20 +12,31 @@ import java.io.File
  */
 object CurlHttp {
 
+    val curl by lazy { CUrlKit() }
+
+
     fun initCurl(){
-//        CUrlKit.init()
+        CUrlKit.init()
     }
 
     fun cleanUp(){
-//        CUrlKit.cleanup()
+        CUrlKit.cleanup()
     }
 
     fun testGet(): String {
-       return CUrlKit().get("https://109cffaa-4442-49c0-b87d-3265b7dc2b3e.mock.pstmn.io/shetj_test")
+       return curl.get("https://109cffaa-4442-49c0-b87d-3265b7dc2b3e.mock.pstmn.io/me.shet")
     }
 
-    fun setCacert(cacert: File) {
+    fun testPost(): String {
+        return curl.postJson("https://a24ca463-edeb-468b-a0ae-8f85dfe81baa.mock.pstmn.io/posttest","{\"code\":\"0000\"}")
+    }
 
+
+
+
+    fun setCertificate(cacert: File) {
+        Log.i("setCertificate",cacert.path)
+        CUrlKit.setCertificate(cacert.path)
     }
 
 }

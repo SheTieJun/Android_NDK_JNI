@@ -1,7 +1,5 @@
 package me.shetj.sdk.curl
 
-import android.util.Log
-
 /**
  *
  * <b>@author：</b> shetj<br>
@@ -16,23 +14,24 @@ class CUrlKit {
             System.loadLibrary("toolsCurl")
         }
 
+        //全局
         @JvmStatic
         external fun init()
 
+        //全局
         @JvmStatic
         external fun cleanup()
 
         @JvmStatic
         external fun getVersion(): String
+
+        //设置证书
+        //如果证书有问题：77:Problem with the SSL CA cert (path? access rights?)
+        @JvmStatic
+        external fun setCertificate(certificatePath: String)
     }
 
-
-
-    external fun postJson(url:String,json:String)
+    external fun postJson(url:String,json:String):String
 
     external fun get(url:String):String
-
-    fun callback(data:String){
-        Log.i("CUrlKit",data)
-    }
 }

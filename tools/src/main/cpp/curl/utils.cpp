@@ -26,20 +26,17 @@ bool utils::icasecompare(std::string const& a, std::string const& b)
 string utils::jString2String(JNIEnv *env,jstring jStr) {
     if (!jStr)
         return "";
+    typedef std::unique_ptr<const char[], std::function<void(const char *)>>
+            JniString;
 
-    const jclass stringClass = env->GetObjectClass(jStr);
-    const jmethodID getBytes = env->GetMethodID(stringClass, "getBytes", "(Ljava/lang/String;)[B");
-    const jbyteArray stringJbytes = (jbyteArray) env->CallObjectMethod(jStr, getBytes, env->NewStringUTF("UTF-8"));
+    JniString cstr(env->GetStringUTFChars(jStr, nullptr), [=](const char *p) {
+        env->ReleaseStringUTFChars(jStr, p);
+    });
 
-    size_t length = (size_t) env->GetArrayLength(stringJbytes);
-    jbyte* pBytes = env->GetByteArrayElements(stringJbytes, NULL);
-
-    std::string ret = std::string((char *)pBytes, length);
-    env->ReleaseByteArrayElements(stringJbytes, pBytes, JNI_ABORT);
-
-    env->DeleteLocalRef(stringJbytes);
-    env->DeleteLocalRef(stringClass);
-    return ret;
+    if (cstr == nullptr) {
+        LOGE( "jString2String: GetStringUTFChars failed");
+    }
+    return cstr.get();
 }
 
 

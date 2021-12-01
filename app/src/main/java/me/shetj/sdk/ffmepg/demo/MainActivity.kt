@@ -1,12 +1,14 @@
 package me.shetj.sdk.ffmepg.demo
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import me.shetj.ndk.lame.LameUtils
 import me.shetj.sdk.curl.CUrlKit
 import me.shetj.sdk.curl.CurlHttp
 import me.shetj.sdk.ffmepg.demo.databinding.ActivityMainBinding
+import me.shetj.sdk.json.JsonKit
 import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
@@ -40,11 +42,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.test.setOnClickListener {
+            CurlHttp.setCertificate(cacert)
             //TODO 需要在线程
             val testGet = CurlHttp.testGet()
+            Log.i("testGet",testGet)
             Toast.makeText(this,testGet,Toast.LENGTH_SHORT).show()
-        }
 
+            //
+            val testPost = CurlHttp.testPost()
+            Log.i("testPost",testPost)
+            Toast.makeText(this,testPost,Toast.LENGTH_SHORT).show()
+        }
+        binding.testJson.setOnClickListener {
+            JsonKit.test()
+        }
 
     }
 

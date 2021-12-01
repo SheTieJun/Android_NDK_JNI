@@ -8,8 +8,8 @@
 #include <iostream>
 #include <string>
 #include <assert.h>
-#include "Clibcurl.h"
 #include "utils.h"
+#include "curl/curl.h"
 
 
 class CurlTools {

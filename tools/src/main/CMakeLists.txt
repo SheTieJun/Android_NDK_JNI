@@ -18,9 +18,13 @@ set(curl_lib ${PROJECT_SOURCE_DIR}/libs/${ANDROID_ABI})
 
 ##当前 cpp目录的所有.c .cpp源文件,并且赋值到SRC_LIST
 AUX_SOURCE_DIRECTORY(cpp/curl SRC_LIST_CURL)
-
+AUX_SOURCE_DIRECTORY(cpp/json SRC_LIST_JSON)
+AUX_SOURCE_DIRECTORY(cpp/my SRC_LIST_MY)
 
 include_directories(${PROJECT_SOURCE_DIR}/cpp/curl)
+include_directories(${PROJECT_SOURCE_DIR}/cpp/json)
+include_directories(${PROJECT_SOURCE_DIR}/cpp/my)
+
 
 add_definitions(-DDEBUG)
 
@@ -32,6 +36,8 @@ add_library( # Sets the name of the library.
 
         # Provides a relative path to your source file(s).
         ${SRC_LIST_CURL}
+        ${SRC_LIST_JSON}
+        ${SRC_LIST_MY}
         )
 
 # Searches for a specified prebuilt library and stores the path as a
@@ -42,6 +48,7 @@ add_library( # Sets the name of the library.
 
 find_library(
         log-lib
+
         log )
 
 find_package(curl REQUIRED CONFIG)

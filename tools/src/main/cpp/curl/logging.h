@@ -9,13 +9,12 @@
 
 #include <jni.h>
 
-namespace curlssl {
-    namespace logging {
+namespace logging {
 
-        [[noreturn, gnu::format(printf, 2, 3)]] void FatalError(JNIEnv* env,
-                                                                const char* fmt, ...);
+    //致命异常
+    [[noreturn, gnu::format(printf, 2, 3)]] void FatalError(JNIEnv *env,
+                                                            const char *fmt, ...);
 
-    }  // namespace logging
-}
+}  // namespace logging
 
 #endif //ANDROID_NDK_LOGGING_H
