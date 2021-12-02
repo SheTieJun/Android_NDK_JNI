@@ -1,10 +1,15 @@
-## curl：C中请求网络很好的库，项目地址：
+## tool
+- 放一些公共类
+- curl: c/c++ 网络请求库
+- jsoncpp:c/c++中解析json很方便的库
 
-https://github.com/curl/curl
+## curl
+项目地址：[https://github.com/curl/curl](https://github.com/curl/curl)
+
 [curlAPI文档](https://curl.se/libcurl/c/)
 
 ### 已实现方法
-```
+```c++
     //设置超时
     bool SetTimeOut(unsigned short usSecond);
 
@@ -49,8 +54,8 @@ https://github.com/curl/curl
 
 
 ### GET 实现
-```c
-    string buf;
+```c++
+    string buf; //结果
     HttpModule get; //每次都创建新的
     get.SetMethod("get");
     get.SetTimeOut(300);
@@ -67,7 +72,7 @@ https://github.com/curl/curl
 ```
 
 ### POST 实现
-```c
+```c++
      string buf;
      HttpModule post; //每次都创建新的
      post.SetMethod("post");
@@ -87,9 +92,9 @@ https://github.com/curl/curl
      }
 ```
 
-## jsoncpp：c++中解析json很方便的库，项目地址：
+## jsoncpp
 
-https://github.com/open-source-parsers/jsoncpp
+c++中解析json很方便的库,项目地址：[https://github.com/open-source-parsers/jsoncpp](https://github.com/open-source-parsers/jsoncpp)
 
 [jsoncpp文档](http://open-source-parsers.github.io/jsoncpp-docs/doxygen/index.html)
 

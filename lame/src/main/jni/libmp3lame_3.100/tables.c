@@ -25,10 +25,10 @@
 # include <config.h>
 #endif
 
-#include "machine.h"
+#include "../include/machine.h"
 
-#include "lame.h"
-#include "tables.h"
+#include "../include/lame.h"
+#include "../include/tables.h"
 
 
 static const uint16_t t1HB[] = {

@@ -26,15 +26,15 @@
 #endif
 
 
-#include "lame.h"
-#include "machine.h"
-#include "encoder.h"
-#include "util.h"
-#include "reservoir.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
+#include "../include/reservoir.h"
 
-#include "bitstream.h"
-#include "lame-analysis.h"
-#include "lame_global_flags.h"
+#include "../include/bitstream.h"
+#include "../include/lame-analysis.h"
+#include "../include/lame_global_flags.h"
 
 
 /*

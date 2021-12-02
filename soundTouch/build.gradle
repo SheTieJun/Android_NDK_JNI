@@ -45,14 +45,8 @@ android {
         }
     }
 
-    //配置需要打包文件so
-    sourceSets {
-        main {
-            jniLibs.srcDirs = ['libs']
-            jni.srcDirs=['src/main/cpp']
-        }
-    }
 
+//// has error
 //    buildFeatures {
 //        prefabPublishing true
 //    }

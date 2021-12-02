@@ -30,11 +30,11 @@
 # include <config.h>
 #endif
 
-#include "lame.h"
-#include "machine.h"
-#include "encoder.h"
-#include "util.h"
-#include "newmdct.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
+#include "../include/newmdct.h"
 
 
 

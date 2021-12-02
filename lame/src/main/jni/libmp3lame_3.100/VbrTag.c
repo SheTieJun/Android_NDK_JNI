@@ -26,14 +26,14 @@
 # include <config.h>
 #endif
 
-#include "lame.h"
-#include "machine.h"
-#include "encoder.h"
-#include "util.h"
-#include "bitstream.h"
-#include "VbrTag.h"
-#include "lame_global_flags.h"
-#include "tables.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
+#include "../include/bitstream.h"
+#include "../include/VbrTag.h"
+#include "../include/lame_global_flags.h"
+#include "../include/tables.h"
 
 #ifdef __sun__
 /* woraround for SunOS 4.x, it has SEEK_* defined here */

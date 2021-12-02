@@ -29,8 +29,6 @@ public:
 
     void addValue(std::string key, int value);
 
-    void addValue(std::string key, long value);
-
     void addValue(std::string key, Json::Value value);
 
     void removeValue(std::string key);

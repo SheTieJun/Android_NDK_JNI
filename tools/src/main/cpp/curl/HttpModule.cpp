@@ -169,7 +169,9 @@ bool HttpModule::SetConnectTimeout(int nSecond) {
 
 bool HttpModule::AddHeader(std::string Key, std::string Value) {
 	int nLen1 = Key.size(), nLen2 =Value.size() ;
-	assert(nLen1 > 0 && nLen2 > 0);
+	if(nLen1 < 0 && nLen2 < 0){
+		return false;
+	}
 	string strHeader(Key);
 	strHeader.append(": ");
 	strHeader.append(Value);

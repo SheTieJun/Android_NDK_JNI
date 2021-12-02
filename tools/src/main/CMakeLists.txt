@@ -29,7 +29,7 @@ include_directories(${PROJECT_SOURCE_DIR}/cpp/my)
 add_definitions(-DDEBUG)
 
 add_library( # Sets the name of the library.
-        toolsCurl
+        tools
 
         # Sets the library as a shared library.
         SHARED
@@ -52,10 +52,9 @@ find_library(
         log )
 
 find_package(curl REQUIRED CONFIG)
-
 find_package(jsoncpp REQUIRED CONFIG)
 
-set_target_properties(toolsCurl PROPERTIES CXX_STANDARD 17)
-target_compile_options(toolsCurl PRIVATE -Wall -Werror)
+set_target_properties(tools PROPERTIES CXX_STANDARD 17)
+target_compile_options(tools PRIVATE -Wall -Werror)
 
-target_link_libraries(toolsCurl ${log-lib} curl::curl jsoncpp::jsoncpp )
+target_link_libraries(tools ${log-lib} curl::curl jsoncpp::jsoncpp )

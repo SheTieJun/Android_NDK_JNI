@@ -36,7 +36,7 @@ object CurlHttp {
 
     fun setCertificate(cacert: File) {
         Log.i("setCertificate",cacert.path)
-        CUrlKit.setCertificate(cacert.path)
+//        CUrlKit.setCertificate(cacert.path)
     }
 
 }

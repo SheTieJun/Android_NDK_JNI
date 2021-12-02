@@ -23,7 +23,6 @@ Java_me_shetj_sdk_json_JsonKit_test(JNIEnv *env, jclass clazz) {
 //
     tool.addValue("key", "value");
     tool.addValue("int", 1);
-    tool.addValue("long", 1L);
     tool.addValue("bool", false);
     tool.addValue("boolo", boolo);
     std::string jsonString;

@@ -96,9 +96,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lame.h"
-#include "machine.h"
-#include "gain_analysis.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/gain_analysis.h"
 
 /* for each filter: */
 /* [0] 48 kHz, [1] 44.1 kHz, [2] 32 kHz, [3] 24 kHz, [4] 22050 Hz, [5] 16 kHz, [6] 12 kHz, [7] is 11025 Hz, [8] 8 kHz */

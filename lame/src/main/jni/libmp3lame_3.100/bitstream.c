@@ -30,17 +30,17 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "lame.h"
-#include "machine.h"
-#include "encoder.h"
-#include "util.h"
-#include "tables.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
+#include "../include/tables.h"
 #include "quantize_pvt.h"
-#include "lame_global_flags.h"
-#include "gain_analysis.h"
-#include "VbrTag.h"
-#include "bitstream.h"
-#include "tables.h"
+#include "../include/lame_global_flags.h"
+#include "../include/gain_analysis.h"
+#include "../include/VbrTag.h"
+#include "../include/bitstream.h"
+#include "../include/tables.h"
 
 
 

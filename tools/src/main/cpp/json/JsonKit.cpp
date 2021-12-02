@@ -28,10 +28,6 @@ void JsonKit::addValue(std::string key, bool value) {
     root[key.c_str()] = value;
 }
 
-void JsonKit::addValue(std::string key, long value) {
-    root[key.c_str()] = value;
-}
-
 void JsonKit::addValue(std::string key, int value) {
     root[key.c_str()] = value;
 }

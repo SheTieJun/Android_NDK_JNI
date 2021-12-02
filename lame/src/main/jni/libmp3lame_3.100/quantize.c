@@ -28,15 +28,15 @@
 # include <config.h>
 #endif
 
-#include "lame.h"
-#include "machine.h"
-#include "encoder.h"
-#include "util.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
 #include "quantize_pvt.h"
-#include "reservoir.h"
-#include "bitstream.h"
-#include "vbrquantize.h"
-#include "quantize.h"
+#include "../include/reservoir.h"
+#include "../include/bitstream.h"
+#include "../include/vbrquantize.h"
+#include "../include/quantize.h"
 #ifdef HAVE_XMMINTRIN_H
 #include "vector/lame_intrin.h"
 #endif
