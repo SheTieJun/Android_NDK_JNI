@@ -24,12 +24,12 @@
 # include <config.h>
 #endif
 
-#include "lame.h"
-#include "machine.h"
-#include "set_get.h"
-#include "encoder.h"
-#include "util.h"
-#include "lame_global_flags.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/set_get.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
+#include "../include/lame_global_flags.h"
 
 #define SET_OPTION(opt, val, def) if (enforce) \
     (void) lame_set_##opt(gfp, val); \

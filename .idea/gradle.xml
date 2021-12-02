@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/ffmpeg" />
             <option value="$PROJECT_DIR$/lame" />
             <option value="$PROJECT_DIR$/soundTouch" />
+            <option value="$PROJECT_DIR$/tools" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

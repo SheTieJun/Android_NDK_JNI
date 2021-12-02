@@ -1,7 +1,7 @@
 //
 // Created by 37510 on 2019/9/6.
 //
-#include "libmp3lame_3.100/lame.h"
+#include "include/lame.h"
 #include "jni.h"
 #include "stdio.h"
 

@@ -31,21 +31,21 @@
 #endif
 
 
-#include "lame.h"
-#include "machine.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
 
-#include "encoder.h"
-#include "util.h"
-#include "lame_global_flags.h"
-#include "gain_analysis.h"
-#include "bitstream.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
+#include "../include/lame_global_flags.h"
+#include "../include/gain_analysis.h"
+#include "../include/bitstream.h"
 #include "quantize_pvt.h"
-#include "set_get.h"
-#include "quantize.h"
-#include "psymodel.h"
-#include "version.h"
-#include "VbrTag.h"
-#include "tables.h"
+#include "../include/set_get.h"
+#include "../include/quantize.h"
+#include "../include/psymodel.h"
+#include "../include/version.h"
+#include "../include/VbrTag.h"
+#include "../include/tables.h"
 
 
 #if defined(__FreeBSD__) && !defined(__alpha__)

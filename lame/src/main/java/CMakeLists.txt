@@ -13,6 +13,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../libs/${ANDROID_ABI})
 ##当前../jni目录的所有.c .cpp源文件
 AUX_SOURCE_DIRECTORY(../jni/libmp3lame_3.100 SRC_LIST)
 
+include_directories(../jni/include)
 #设置变量
 #SET(LAME_LIBMP3_DIR  ../jni/libmp3lame_3.100)
 #

@@ -26,14 +26,14 @@
 # include <config.h>
 #endif
 
-#include "lame.h"
-#include "machine.h"
-#include "encoder.h"
-#include "util.h"
-#include "bitstream.h"  /* because of compute_flushbits */
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/encoder.h"
+#include "../include/util.h"
+#include "../include/bitstream.h"  /* because of compute_flushbits */
 
-#include "set_get.h"
-#include "lame_global_flags.h"
+#include "../include/set_get.h"
+#include "../include/lame_global_flags.h"
 
 /*
  * input stream description

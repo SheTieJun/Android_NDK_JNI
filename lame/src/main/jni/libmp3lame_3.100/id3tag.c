@@ -52,13 +52,13 @@ char   *strchr(), *strrchr();
 #endif
 
 
-#include "lame.h"
-#include "machine.h"
-#include "encoder.h"
-#include "id3tag.h"
-#include "lame_global_flags.h"
-#include "util.h"
-#include "bitstream.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
+#include "../include/encoder.h"
+#include "../include/id3tag.h"
+#include "../include/lame_global_flags.h"
+#include "../include/util.h"
+#include "../include/bitstream.h"
 
 
 static const char *const genre_names[] = {

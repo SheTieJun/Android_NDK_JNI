@@ -36,10 +36,10 @@
 #endif
 
 
-#include "lame.h"
-#include "machine.h"
+#include "../include/lame.h"
+#include "../include/machine.h"
 
-#include "version.h"    /* macros of version numbers */
+#include "../include/version.h"    /* macros of version numbers */
 
 
 
