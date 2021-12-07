@@ -25,6 +25,8 @@
 https://github.com/curl/curl
 [curlAPI文档](https://curl.se/libcurl/c/)
 
+#### openssl
+[https://github.com/openssl/openssl](https://github.com/openssl/openssl)
 
 #### jsoncpp：c++中解析json很方便的库，项目地址：
 https://github.com/open-source-parsers/jsoncpp
