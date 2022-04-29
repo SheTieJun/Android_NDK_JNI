@@ -54,9 +54,10 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this,testPost,Toast.LENGTH_SHORT).show()
         }
         binding.testJson.setOnClickListener {
+
             JsonKit.test()
         }
-
+        STKit.getInstance().setPitchSemiTones(10f)
     }
 
     /**

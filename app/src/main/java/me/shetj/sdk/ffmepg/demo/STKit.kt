@@ -19,7 +19,9 @@ class STKit : ISoundTouch {
 
         fun getInstance(): STKit {
             return sInstance ?: synchronized(STKit::class.java) {
-                return STKit()
+                return STKit().also {
+                    sInstance = it
+                }
             }
         }
 

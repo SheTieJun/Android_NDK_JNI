@@ -11,7 +11,7 @@ class JsonKit {
 
     companion object{
         init {
-            System.loadLibrary("toolsCurl")
+            System.loadLibrary("tools")
         }
 
         //全局
