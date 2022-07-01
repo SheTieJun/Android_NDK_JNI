@@ -30,8 +30,8 @@ class MainActivity : AppCompatActivity() {
 
         // Example of a call to a native method
         try {
-            STKit.getInstance().init(1, 44100, 1f, 10f, 1f)
-            LameUtils.init(44100, 1, 44100, 44, 3)
+            STKit.getInstance().init(2, 44100, 1f, 10f, 1f)
+            LameUtils.init(44100, 1, 44100, 64, 3,3000,200)
 
             binding.sampleText.text = stringFromJNI() +
                     "\nLame:" + LameUtils.version() +
@@ -57,7 +57,6 @@ class MainActivity : AppCompatActivity() {
 
             JsonKit.test()
         }
-        STKit.getInstance().setPitchSemiTones(10f)
     }
 
     /**
@@ -76,5 +75,6 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         CurlHttp.cleanUp()
+        STKit.onDestroy()
     }
 }

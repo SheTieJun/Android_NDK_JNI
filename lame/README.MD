@@ -29,3 +29,21 @@
 ```
 - 清空缓存中的数据：`lame_encode_flush`
 - 关闭:`lame_close(lame);`
+
+
+[Lame-Detail-Args](https://doorxp.github.io/apple/2012/07/10/Lame-Detail-Args.html)
+[Lame说明文档](https://www.jianshu.com/p/5208d6dcd7eb)
+
+
+### 其他
+#### 1. 设置滤波器
+```C
+    lame_set_lowpassfreq(lame,lowpassfreq);
+    lame_set_highpassfreq(lame,highpassfreq);
+```
+
+#### 2. VBR模式
+```C
+    lame_set_VBR(lame,vbr_mtrh); //设置成vbr
+    lame_set_VBR_q(lame,quality);
+```

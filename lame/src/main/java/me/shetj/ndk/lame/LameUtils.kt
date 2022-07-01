@@ -8,12 +8,22 @@ object LameUtils {
 
     external fun version(): String
 
+    /**
+     *  * –lowpass freq	设定低通滤波器的起始点为 freq
+     * 高于这个频率的声音会被截除。 Hz
+     *  * –highpass freq	设定高通滤波起始点为 freq
+     * 低于这个频率的声音会被截除。 Hz
+     *  -1=no filter
+     */
     external fun init(
         inSampleRate: Int,
         inChannel: Int,
         outSampleRate: Int,
         outBitrate: Int,
-        quality: Int
+        quality: Int,
+        lowpassFreq:Int,
+        highpassFreq:Int,
+        vbr:Boolean
     )
 
     /**
@@ -61,6 +71,12 @@ object LameUtils {
         samples: Int,
         mp3buf: ByteArray
     ): Int
+
+
+    /**
+     * 用来处理，VBR模式的时候，时间出现问题
+     */
+    external fun writeVBRHeader(file:String)
 
     external fun flush(mp3buf: ByteArray): Int
     external fun close()

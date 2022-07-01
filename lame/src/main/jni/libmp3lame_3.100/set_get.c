@@ -1286,6 +1286,14 @@ lame_get_VBR_hard_min(const lame_global_flags * gfp)
 
 /********************************************************************
  * Filtering control
+ * –lowpass freq	设定低通滤波器的起始点为 freq
+ * 高于这个频率的声音会被截除。 Hz
+ * –lowpass-width freq	设定低通滤波器的宽度，预设为 15% 的 –lowpass 频率。
+ * –highpass freq	设定高通滤波起始点为 freq
+ * 低于这个频率的声音会被截除。 Hz
+ * –highpass-width freq	设定高通滤波器的宽度，预设为 15% 的 –highpass 频率。
+ * –resample freq	输出档案的取样频率。
+ * –cwlimit freq	计算音色到指定的频率。
  ***********************************************************************/
 
 /*
