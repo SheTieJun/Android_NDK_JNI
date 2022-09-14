@@ -64,7 +64,12 @@ dependencies {
     implementation project(path: ':soundTouch')
     implementation project(path: ':lame')
     implementation project(path: ':tools')
+    implementation project(path: ':ffmpeg-lite-kt')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    def version = "1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$version"
+    implementation 'androidx.fragment:fragment-ktx:1.2.5'
 }
