@@ -1,30 +1,7 @@
 package io.microshow.rxffmpeg
 
 import android.text.TextUtils
-import kotlin.jvm.Synchronized
-import io.microshow.rxffmpeg.player.IMediaPlayer
-import io.microshow.rxffmpeg.player.MeasureHelper.VideoSizeInfo
-import io.microshow.rxffmpeg.player.MeasureHelper.FitModel
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerView
-import io.microshow.rxffmpeg.player.BaseMediaPlayer
-import io.microshow.rxffmpeg.player.IMediaPlayer.OnLoadingListener
-import io.microshow.rxffmpeg.player.IMediaPlayer.OnTimeUpdateListener
-import kotlin.jvm.JvmOverloads
-import io.microshow.rxffmpeg.player.RxFFmpegPlayer
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerImpl
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerView.PlayerCoreType
-import io.microshow.rxffmpeg.player.MeasureHelper
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerController
-import io.microshow.rxffmpeg.player.ScaleTextureView
-import io.microshow.rxffmpeg.player.SystemMediaPlayerImpl
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerView.VideoSizeChangedListener
-import io.microshow.rxffmpeg.player.SystemMediaPlayer
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerControllerImpl.PlayerListener
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerControllerImpl
-import io.microshow.rxffmpeg.RxFFmpegInvoke
-import kotlin.jvm.Volatile
-import io.microshow.rxffmpeg.RxFFmpegInvoke.IFFmpegListener
-import io.microshow.rxffmpeg.RxFFmpegCommandList
+import me.shetj.ffmpeg.FFmpegCommandList
 
 internal object RxFFmpegCommandSupport {
     /**
@@ -42,7 +19,7 @@ internal object RxFFmpegCommandSupport {
         boxblur: String?,
         isLog: Boolean
     ): Array<String> {
-        val cmdlist = RxFFmpegCommandList()
+        val cmdlist = FFmpegCommandList()
         cmdlist.append("-i")
         cmdlist.append(inputPath)
         cmdlist.append("-vf")

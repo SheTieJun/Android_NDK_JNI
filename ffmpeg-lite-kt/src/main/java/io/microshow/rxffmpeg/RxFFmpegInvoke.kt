@@ -1,6 +1,5 @@
 package io.microshow.rxffmpeg
 
-import me.shetj.ffmpeg.kt.RunState
 
 
 /**
@@ -40,23 +39,6 @@ internal class RxFFmpegInvoke private constructor() {
      * ffmpeg 回调监听
      */
     var fFmpegListener: IFFmpegListener? = null
-
-    /**
-     * 异步执行
-     *
-     * @param command
-     * @param mffmpegListener
-     */
-    fun runCommandAsync(command: Array<String>, mffmpegListener: IFFmpegListener?) {
-        fFmpegListener = mffmpegListener
-        synchronized(RxFFmpegInvoke::class.java) {
-            // 不允许多线程访问
-            Thread {
-                val ret = runFFmpegCmd(command)
-                onClean()
-            }.start()
-        }
-    }
 
     /**
      * 同步执行 (可以结合RxJava)
@@ -172,6 +154,10 @@ internal class RxFFmpegInvoke private constructor() {
      */
     interface IFFmpegListener {
 
+        /**
+         * On start
+         * 开始执行
+         */
         fun onStart()
 
         /**

@@ -1,6 +1,9 @@
 //
 // Created by 37510 on 2019/9/6.
 //
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
 #include "include/lame.h"
 #include "jni.h"
 #include "stdio.h"
@@ -12,9 +15,6 @@ JNIEXPORT jstring JNICALL Java_me_shetj_ndk_lame_LameUtils_version(
         jclass jcls) {
     return (*env)->NewStringUTF(env, get_lame_version());
 };
-
-
-
 
 JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
         JNIEnv *env,
@@ -32,15 +32,16 @@ JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
         lame = NULL;
     }
     lame = lame_init();
-//初始化，设置参数
+    //初始化，设置参数
     lame_set_in_samplerate(lame, inSamplerate);//输入采样率
     lame_set_out_samplerate(lame, outSamplerate);//输出采样率
     lame_set_num_channels(lame, inChannel);//声道
     lame_set_brate(lame, outBitrate);//比特率
     lame_set_quality(lame, quality);//质量
     if (vbr){
+        // 读取录制时间问题会存在
         lame_set_VBR(lame,vbr_mtrh); //设置成vbr
-        lame_set_bWriteVbrTag(lame,1); //用来解决vbr，1 on, 0 off读取时间问题,但是无效
+        lame_set_bWriteVbrTag(lame,1); //用来解决vbr，1 on, 0 off
     }
     lame_set_lowpassfreq(lame,lowpassfreq);
     lame_set_highpassfreq(lame,highpassfreq);
@@ -180,4 +181,30 @@ Java_me_shetj_ndk_lame_LameUtils_writeVBRHeader(JNIEnv *env, jobject thiz, jstri
     //must before close lame
     FILE* mp3File = fopen(file,"wb+");
     lame_mp3_tags_fid(lame, mp3File);
+}
+
+JNIEXPORT jint JNICALL
+Java_me_shetj_ndk_lame_LameUtils_getPCMDB(JNIEnv *env, jobject thiz, jshortArray pcm, jint samples) {
+
+    int db = 0;
+    short int value = 0;
+    double sum = 0;
+
+    jshort *j_pcm_buffer = (*env)->GetShortArrayElements(env, pcm, NULL);
+
+    //16 bit == 2字节 == short int
+    for(int i = 0; i < samples; i += 2)
+    {
+        memcpy(&value, j_pcm_buffer+i, 2); //获取2个字节的大小（值）
+        sum += abs(value); //绝对值求和
+    }
+    sum = sum / (samples / 2); //求平均值（2个字节表示一个振幅，所以振幅个数为：size/2个）
+    if(sum > 0)
+    {
+        db = (int)(20.0*log10(sum));
+    }
+    //释放参数
+    (*env)->ReleaseShortArrayElements(env, pcm, j_pcm_buffer, 0);
+    return db;
+
 }

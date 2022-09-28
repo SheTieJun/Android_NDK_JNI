@@ -29,4 +29,5 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
 apply from : "https://gist.githubusercontent.com/SheTieJun/f4cb1bd33997c2b46d9e3df40b95a02e/raw/c7b65d18aabfeccc09c37e3b2e7964cdd1f8e856/subprojects.gradle"

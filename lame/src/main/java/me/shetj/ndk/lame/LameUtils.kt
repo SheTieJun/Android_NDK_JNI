@@ -21,9 +21,9 @@ object LameUtils {
         outSampleRate: Int,
         outBitrate: Int,
         quality: Int,
-        lowpassFreq:Int,
-        highpassFreq:Int,
-        vbr:Boolean
+        lowpassFreq: Int,
+        highpassFreq: Int,
+        vbr: Boolean
     )
 
     /**
@@ -76,8 +76,14 @@ object LameUtils {
     /**
      * 用来处理，VBR模式的时候，时间出现问题
      */
-    external fun writeVBRHeader(file:String)
+    external fun writeVBRHeader(file: String)
 
     external fun flush(mp3buf: ByteArray): Int
     external fun close()
+
+    /**
+     * 获取pcm的db
+     */
+    external fun getPCMDB(pcm: ShortArray, samples: Int):Int
+
 }

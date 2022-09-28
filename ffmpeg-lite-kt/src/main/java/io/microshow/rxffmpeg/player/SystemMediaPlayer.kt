@@ -6,7 +6,7 @@ import android.view.Surface
 import io.microshow.rxffmpeg.player.IMediaPlayer.OnLoadingListener
 import io.microshow.rxffmpeg.player.IMediaPlayer.OnTimeUpdateListener
 import kotlinx.coroutines.*
-import me.shetj.ffmpeg.kt.defScope
+import me.shetj.ffmpeg.defScope
 import java.io.IOException
 
 /**

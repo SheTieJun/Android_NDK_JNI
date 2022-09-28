@@ -2,31 +2,11 @@ package io.microshow.rxffmpeg.player
 
 import android.content.Context
 import android.view.View
+import android.view.View.OnClickListener
 import android.widget.*
-import kotlin.jvm.Synchronized
-import io.microshow.rxffmpeg.player.IMediaPlayer
-import io.microshow.rxffmpeg.player.MeasureHelper.VideoSizeInfo
-import io.microshow.rxffmpeg.player.MeasureHelper.FitModel
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerView
-import io.microshow.rxffmpeg.player.BaseMediaPlayer
 import io.microshow.rxffmpeg.player.IMediaPlayer.OnLoadingListener
 import io.microshow.rxffmpeg.player.IMediaPlayer.OnTimeUpdateListener
-import kotlin.jvm.JvmOverloads
-import io.microshow.rxffmpeg.player.RxFFmpegPlayer
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerImpl
 import io.microshow.rxffmpeg.player.RxFFmpegPlayerView.PlayerCoreType
-import io.microshow.rxffmpeg.player.MeasureHelper
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerController
-import io.microshow.rxffmpeg.player.ScaleTextureView
-import io.microshow.rxffmpeg.player.SystemMediaPlayerImpl
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerView.VideoSizeChangedListener
-import io.microshow.rxffmpeg.player.SystemMediaPlayer
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerControllerImpl.PlayerListener
-import io.microshow.rxffmpeg.player.RxFFmpegPlayerControllerImpl
-import io.microshow.rxffmpeg.RxFFmpegInvoke
-import kotlin.jvm.Volatile
-import io.microshow.rxffmpeg.RxFFmpegInvoke.IFFmpegListener
-import io.microshow.rxffmpeg.RxFFmpegCommandList
 import me.shetj.ffmpeg.kt.R
 import java.lang.ref.WeakReference
 
