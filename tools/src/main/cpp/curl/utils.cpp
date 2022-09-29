@@ -39,6 +39,8 @@ string utils::jString2String(JNIEnv *env,jstring jStr) {
     return cstr.get();
 }
 
-
+bool ToCppBool(jboolean value) {
+    return value == JNI_TRUE;
+}
 
 

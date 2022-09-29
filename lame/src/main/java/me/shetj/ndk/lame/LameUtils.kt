@@ -23,7 +23,8 @@ object LameUtils {
         quality: Int,
         lowpassFreq: Int,
         highpassFreq: Int,
-        vbr: Boolean
+        vbr: Boolean,
+        enableLog:Boolean //是否输出日志
     )
 
     /**

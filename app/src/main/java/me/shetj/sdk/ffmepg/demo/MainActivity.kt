@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         // Example of a call to a native method
         try {
             STKit.getInstance().init(2, 44100, 1f, 10f, 1f)
-            LameUtils.init(44100, 1, 44100, 64, 3, 3000, 200, false)
+            LameUtils.init(44100, 1, 44100, 64, 3, 3000, 200, false,true)
             binding.sampleText.text = stringFromJNI() +
                     "\nLame:" + LameUtils.version() +
                     "\nSoundTouch:${STKit.getInstance().getVersion()}" +

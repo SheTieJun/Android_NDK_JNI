@@ -2297,10 +2297,12 @@ lame_mp3_tags_fid(lame_global_flags * gfp, FILE * fpStream)
     }
     gfc = gfp->internal_flags;
     if (!is_lame_internal_flags_valid(gfc)) {
+        MSGF(gfc, "Error: could not update LAME tag, is_lame_internal_flags_valid = false.\n");
         return;
     }
     cfg = &gfc->cfg;
     if (!cfg->write_lame_tag) {
+        MSGF(gfc, "Error: could not update LAME tag, write_lame_tag = false.\n");
         return;
     }
     /* Write Xing header again */
@@ -2309,6 +2311,7 @@ lame_mp3_tags_fid(lame_global_flags * gfp, FILE * fpStream)
         switch (rc) {
         default:
             /* OK */
+            MSGF(gfc, "update LAME tag ok.\n");
             break;
 
         case -1:

@@ -7,6 +7,17 @@
 #include "include/lame.h"
 #include "jni.h"
 #include "stdio.h"
+#include <android/log.h>
+
+//打印日志
+#define LAME_TAG "Lame_Log"
+#define LogE(...) __android_log_print(ANDROID_LOG_ERROR,LAME_TAG ,__VA_ARGS__)
+#define LogD(...) __android_log_print(ANDROID_LOG_DEBUG,LAME_TAG ,__VA_ARGS__)
+
+
+#define BOOL int
+#define TRUE 1
+#define FALSE 0
 
 static lame_global_flags *lame = NULL;
 
@@ -15,6 +26,24 @@ JNIEXPORT jstring JNICALL Java_me_shetj_ndk_lame_LameUtils_version(
         jclass jcls) {
     return (*env)->NewStringUTF(env, get_lame_version());
 };
+
+void errorMsg(const char *msg, va_list vaList) {
+    char string[256];
+    vsprintf(string, msg, vaList);
+    LogE("%s", string);
+}
+
+void debugMsg(const char *msg, va_list vaList) {
+    char string[256];
+    vsprintf(string, msg, vaList);
+    LogD("%s", string);
+}
+
+void wMsg(const char *msg, va_list vaList) {
+    char string[256];
+    vsprintf(string, msg, vaList);
+    LogD("%s", string);
+}
 
 JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
         JNIEnv *env,
@@ -26,7 +55,8 @@ JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
         jint quality,
         jint lowpassfreq,
         jint highpassfreq,
-        jboolean vbr) {
+        jboolean vbr,
+        jboolean enableLog) {
     if (lame != NULL) {
         lame_close(lame);
         lame = NULL;
@@ -38,15 +68,26 @@ JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
     lame_set_num_channels(lame, inChannel);//声道
     lame_set_brate(lame, outBitrate);//比特率
     lame_set_quality(lame, quality);//质量
-    if (vbr){
+    if (vbr) {
         // 读取录制时间问题会存在
-        lame_set_VBR(lame,vbr_mtrh); //设置成vbr
-        lame_set_bWriteVbrTag(lame,1); //用来解决vbr，1 on, 0 off
+        lame_set_VBR(lame, vbr_mtrh); //设置成vbr
+        lame_set_bWriteVbrTag(lame, 1); //用来解决vbr，1 on, 0 off
+        lame_set_VBR_mean_bitrate_kbps(lame, outBitrate);
     }
-    lame_set_lowpassfreq(lame,lowpassfreq);
-    lame_set_highpassfreq(lame,highpassfreq);
+    lame_set_lowpassfreq(lame, lowpassfreq); //设置滤波器，-1 disabled
+    lame_set_highpassfreq(lame, highpassfreq);//设置滤波器，-1 disabled
+    //设置信息输出
+    if (enableLog) {
+        lame_set_errorf(lame, errorMsg);
+        lame_set_debugf(lame, debugMsg);
+        lame_set_msgf(lame, wMsg);
+        LogD("lame_init_params:\ninSamplerate =%d,\ninChannel=%d,\noutSamplerate=%d,\noutBitrate=%d,\nquality=%d,\nlowpassfreq=%d,\nhighpassfreq=%d,\nvbr=%hhu",
+             inSamplerate, inChannel, outSamplerate, outBitrate, quality, lowpassfreq,
+             highpassfreq,vbr);
+    }
     lame_init_params(lame);
 }
+
 
 
 JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encode(
@@ -176,15 +217,39 @@ JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_close(
     lame = NULL;
 }
 
+// jstring转string类型方法
+char *jstring2string(JNIEnv *env, jstring jstr) {
+    char *bytes = NULL;
+    jclass classString = (*env)->FindClass(env, "java/lang/String");
+    jbyteArray byteArray = (jbyteArray) (*env)->CallObjectMethod(env,
+                                                                 jstr,
+                                                                 (*env)->GetMethodID(env,
+                                                                                     classString,
+                                                                                     "getBytes",
+                                                                                     "(Ljava/lang/String;)[B"),
+                                                                 (*env)->NewStringUTF(env, "UTF8"));
+    jsize length = (*env)->GetArrayLength(env, byteArray);
+    jbyte *jbytes = (*env)->GetByteArrayElements(env, byteArray, JNI_FALSE);
+    if (length > 0) {
+        bytes = (char *) malloc(length + 1);
+        memcpy(bytes, jbytes, length);
+        bytes[length] = 0;
+    }
+    (*env)->ReleaseByteArrayElements(env, byteArray, jbytes, 0);
+    return bytes;
+}
+
 JNIEXPORT void JNICALL
 Java_me_shetj_ndk_lame_LameUtils_writeVBRHeader(JNIEnv *env, jobject thiz, jstring file) {
-    //must before close lame
-    FILE* mp3File = fopen(file,"wb+");
+    char *path = jstring2string(env, file);
+    FILE *mp3File = fopen(path, "ab+");
     lame_mp3_tags_fid(lame, mp3File);
+    fclose(mp3File);
 }
 
 JNIEXPORT jint JNICALL
-Java_me_shetj_ndk_lame_LameUtils_getPCMDB(JNIEnv *env, jobject thiz, jshortArray pcm, jint samples) {
+Java_me_shetj_ndk_lame_LameUtils_getPCMDB(JNIEnv *env, jobject thiz, jshortArray pcm,
+                                          jint samples) {
 
     int db = 0;
     short int value = 0;
@@ -193,15 +258,13 @@ Java_me_shetj_ndk_lame_LameUtils_getPCMDB(JNIEnv *env, jobject thiz, jshortArray
     jshort *j_pcm_buffer = (*env)->GetShortArrayElements(env, pcm, NULL);
 
     //16 bit == 2字节 == short int
-    for(int i = 0; i < samples; i += 2)
-    {
-        memcpy(&value, j_pcm_buffer+i, 2); //获取2个字节的大小（值）
+    for (int i = 0; i < samples; i += 2) {
+        memcpy(&value, j_pcm_buffer + i, 2); //获取2个字节的大小（值）
         sum += abs(value); //绝对值求和
     }
     sum = sum / (samples / 2); //求平均值（2个字节表示一个振幅，所以振幅个数为：size/2个）
-    if(sum > 0)
-    {
-        db = (int)(20.0*log10(sum));
+    if (sum > 0) {
+        db = (int) (20.0 * log10(sum));
     }
     //释放参数
     (*env)->ReleaseShortArrayElements(env, pcm, j_pcm_buffer, 0);
