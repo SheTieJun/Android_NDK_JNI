@@ -7,10 +7,19 @@ FFmpeg Kotlin 协程封装
 
 ## How TO USE
 
+### 1.use coroutines
+
 ```kotlin
 lifecycleScope.launch {
     val command = "ffmpeg -y -i input.mp4 -o output.gif".convertToCommand()
-    FFmpegKit.runCommand(command).collect {
+    val result = FFmpegKit.runCommand(command)
+}
+```
+###  2.use coroutines :Flow
+```kotlin
+lifecycleScope.launch {
+    val command = "ffmpeg -y -i input.mp4 -o output.gif".convertToCommand()
+    FFmpegKit.runCommandFlow(command).collect {
         when (it) {
             FFmpegState.OnCancel -> {
                 Log.e("FFmpegKit", "OnCancel")

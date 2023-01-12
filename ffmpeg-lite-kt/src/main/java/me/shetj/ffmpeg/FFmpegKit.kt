@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 object FFmpegKit {
 
@@ -17,7 +18,7 @@ object FFmpegKit {
     }
 
 
-    fun runCommand(command: Array<String>): Flow<FFmpegState> {
+    fun runCommandFlow(command: Array<String>): Flow<FFmpegState> {
         return callbackFlow {
             kotlin.runCatching {
                 ffmpegInvoke.runCommand(command, object : RxFFmpegInvoke.IFFmpegListener {
@@ -53,7 +54,31 @@ object FFmpegKit {
                 Log.i("FFmpeg", "runCommand close")
             }
         }.catch { cause: Throwable ->
-            Log.e("FFmpeg",cause.stackTraceToString())
+            Log.e("FFmpeg", cause.stackTraceToString())
+        }
+    }
+
+    suspend fun runCommand(command: Array<String>): FFmpegState {
+        return suspendCancellableCoroutine {
+            ffmpegInvoke.runCommand(command, object : RxFFmpegInvoke.IFFmpegListener {
+                override fun onStart() {
+                }
+
+                override fun onFinish() {
+                    it.resumeWith(Result.success(FFmpegState.OnFinish))
+                }
+
+                override fun onProgress(progress: Int, progressTime: Long) {
+                }
+
+                override fun onCancel() {
+                    it.resumeWith(Result.success(FFmpegState.OnCancel))
+                }
+
+                override fun onError(message: String?) {
+                    it.resumeWith(Result.success(FFmpegState.OnError(message)))
+                }
+            })
         }
     }
 

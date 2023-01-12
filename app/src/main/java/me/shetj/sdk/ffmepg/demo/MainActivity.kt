@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         binding.ffmpegKit.setOnClickListener {
             lifecycleScope.launch {
                 val command = "ffmpeg y ".convertToCommand()
-                FFmpegKit.runCommand(command).collect {
+                FFmpegKit.runCommandFlow(command).collect {
                     when (it) {
                         FFmpegState.OnCancel -> {
                             Log.e("FFmpegKit", "OnCancel")
