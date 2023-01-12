@@ -6,7 +6,6 @@ import android.view.Surface
 import io.microshow.rxffmpeg.player.IMediaPlayer.OnLoadingListener
 import io.microshow.rxffmpeg.player.IMediaPlayer.OnTimeUpdateListener
 import kotlinx.coroutines.*
-import me.shetj.ffmpeg.defScope
 import java.io.IOException
 
 /**
@@ -17,7 +16,7 @@ internal abstract class SystemMediaPlayer : BaseMediaPlayer() {
 
 
     private var timeJob: Job? = null
-    private val scope: CoroutineScope by defScope()
+    private val scope: CoroutineScope by lazy { CoroutineScope(Dispatchers.Main.immediate + SupervisorJob() + Dispatchers.IO) }
 
     var mMediaPlayer: MediaPlayer
 
