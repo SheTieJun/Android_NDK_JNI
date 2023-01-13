@@ -6,7 +6,7 @@ afterEvaluate {
             release(MavenPublication) {
                 groupId local_group_id
                 from components.release
-                artifactId = 'soundTouch'
+                artifactId = 'soundtouch'
                 version = "0.0.1"
             }
         }

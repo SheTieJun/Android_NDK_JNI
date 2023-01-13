@@ -2,11 +2,13 @@ package me.shetj.ffmpeg
 
 import android.util.Log
 import io.microshow.rxffmpeg.RxFFmpegInvoke
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 
 object FFmpegKit {
 

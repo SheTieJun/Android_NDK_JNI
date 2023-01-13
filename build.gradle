@@ -1,33 +1,42 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
-    ext.kotlin_version = "1.7.10"
-
-    ext.sdk_version = '1.0.0'
-
-    ext.local_group_id = 'com.github.shetiejun.android-ndk'
-
     repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        gradlePluginPortal()
     }
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-        mavenLocal()
+plugins {
+    id 'com.android.application' version '7.2.2' apply false
+    id 'com.android.library' version '7.2.2' apply false
+    id 'org.jetbrains.kotlin.android' version '1.5.31' apply false
+    id 'maven-publish'
+    id 'com.google.devtools.ksp' version '1.5.31-1.0.1'
+    id "com.diffplug.spotless" version "6.0.0"
+}
+
+
+ext.kotlin_version = "1.7.10"
+
+ext.sdk_version = '1.0.0'
+
+ext.local_group_id = 'com.shetj.android-ndk'
+
+
+subprojects {
+
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    apply plugin: 'maven-publish'
+
+    publishing {
+        repositories {
+            maven {
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/SheTieJun/Android_NDK_JNI")
+                credentials {
+                    username = "SheTieJun"
+                    password = properties.getProperty("gpk_token") ?: System.getenv("gpk_token")
+                }
+            }
+        }
     }
 }
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-
-apply from : "https://gist.githubusercontent.com/SheTieJun/f4cb1bd33997c2b46d9e3df40b95a02e/raw/c7b65d18aabfeccc09c37e3b2e7964cdd1f8e856/subprojects.gradle"
