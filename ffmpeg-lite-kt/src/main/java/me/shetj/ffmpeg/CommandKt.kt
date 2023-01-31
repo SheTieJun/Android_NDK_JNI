@@ -45,9 +45,38 @@ fun buildCommand(block: (FFmpegCommandList.() -> Unit)): Array<String> {
  * @return
  */
 fun buildCutCommand(input: String, output: String, startTime: Double = 0.0, endTime: Double): Array<String> {
-   return "ffmpeg -y -ss $startTime -i $input -t $endTime -write_xing 0 -id3v2_version 0 -c copy -avoid_negative_ts 1 $output"
-        .split(" ")
-        .toTypedArray()
+   return "ffmpeg -y -ss ${doubleToTs(startTime)} -i $input -t ${doubleToTs(endTime)} -write_xing 0 -id3v2_version 0 -c copy -avoid_negative_ts 1 $output"
+       .convertToCommand()
+}
+
+/**
+ * Build cut command
+ *
+ * @param input 输入文件
+ * @param output 输出文件
+ * @param startTime 开始时间  00:00.0
+ * @param endTime 结束时间 00:00.0
+ * @return
+ */
+fun buildCutCommand(input: String, output: String, startTime: String, endTime: String): Array<String> {
+    return "ffmpeg -y -ss $startTime -i $input -t $endTime -write_xing 0 -id3v2_version 0 -c copy -avoid_negative_ts 1 $output"
+        .convertToCommand()
+}
+
+
+private fun doubleToTs(seconds: Double): String {
+    val mils = seconds%1000
+    val second = seconds/1000
+    return (getTwoDecimalsValue(second.toInt() / 60) + ":"
+            + getTwoDecimalsValue(second.toInt()  % 60)) +"."+ mils.toInt()
+}
+
+private fun getTwoDecimalsValue(value: Int): String {
+    return if (value in 0..9) {
+        "0$value"
+    } else {
+        value.toString() + ""
+    }
 }
 
 
@@ -59,20 +88,19 @@ fun buildCutCommand(input: String, output: String, startTime: Double = 0.0, endT
  * @return
  */
 fun buildMergeCommand(vararg inputs: String, output: String): Array<String> {
-    val inputList = StringBuilder()
+    val inputStringBuilder = StringBuilder()
     inputs.forEach {
         if (inputs.isEmpty() || !File(it).exists()) {
             return@forEach
         }
         // 加入首个
-        if (inputList.isEmpty()) {
-            inputList.append(it)
+        if (inputStringBuilder.isEmpty()) {
+            inputStringBuilder.append(it)
             return@forEach
         }
         // 后续
-        inputList.append("|$it")
+        inputStringBuilder.append("|$it")
     }
-    return "ffmpeg -y -i concat:$inputList -write_xing 0 -id3v2_version 0 -acodec copy $output"
-        .split(" ")
-        .toTypedArray()
+    return "ffmpeg -y -i concat:$inputStringBuilder -write_xing 0 -id3v2_version 0 -acodec copy $output"
+        .convertToCommand()
 }
