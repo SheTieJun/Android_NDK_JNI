@@ -16,9 +16,9 @@ project("ns")
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../libs/${ANDROID_ABI})
 
-include_directories(webrtc_ns_v3)
+include_directories(webrtc_ns)
 
-AUX_SOURCE_DIRECTORY(webrtc_ns_v3 SRC_LIST)
+AUX_SOURCE_DIRECTORY(webrtc_ns SRC_LIST)
 
 add_library( # Sets the name of the library.
         webrtc-ns

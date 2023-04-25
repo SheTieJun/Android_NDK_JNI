@@ -113,7 +113,6 @@ namespace webrtc {
             std::copy(delay_buffer.begin(), delay_buffer.end(), delayed_frame.begin());
             std::copy(frame.begin(), frame.begin() + kSamplesFromFrame,
                       delayed_frame.begin() + delay_buffer.size());
-
             std::copy(frame.begin() + kSamplesFromFrame, frame.end(),
                       delay_buffer.begin());
         }
@@ -139,7 +138,6 @@ namespace webrtc {
             for (float v : frame) {
                 energy += v * v;
             }
-
             return energy;
         }
 
@@ -151,7 +149,6 @@ namespace webrtc {
             signal_spectrum[0] = fabsf(real[0]) + 1.f;
             signal_spectrum[kFftSizeBy2Plus1 - 1] =
                     fabsf(real[kFftSizeBy2Plus1 - 1]) + 1.f;
-
             for (size_t i = 1; i < kFftSizeBy2Plus1 - 1; ++i) {
                 signal_spectrum[i] =
                         SqrtFastApproximation(real[i] * real[i] + imag[i] * imag[i]) + 1.f;
@@ -193,7 +190,6 @@ namespace webrtc {
             // Average speech prob and filter gain for the end of the lowest band.
             constexpr int kNumAvgBins = 32;
             constexpr float kOneByNumAvgBins = 1.f / kNumAvgBins;
-
             float avg_prob_speech = 0.f;
             float avg_filter_gain = 0.f;
             for (size_t i = kFftSizeBy2Plus1 - kNumAvgBins - 1; i < kFftSizeBy2Plus1 - 1;
@@ -203,7 +199,6 @@ namespace webrtc {
             }
             avg_prob_speech = avg_prob_speech * kOneByNumAvgBins;
             avg_filter_gain = avg_filter_gain * kOneByNumAvgBins;
-
             // If the speech was suppressed by a component between Analyze and Process, an
             // example being by an AEC, it should not be considered speech for the purpose
             // of high band suppression. To that end, the speech probability is scaled
@@ -214,29 +209,23 @@ namespace webrtc {
                 sum_analysis_spectrum += prev_analysis_signal_spectrum[i];
                 sum_processing_spectrum += signal_spectrum[i];
             }
-
             // The magnitude spectrum computation enforces the spectrum to be strictly
             // positive.
             RTC_DCHECK_GT(sum_analysis_spectrum, 0.f);
             avg_prob_speech *= sum_processing_spectrum / sum_analysis_spectrum;
-
             // Compute gain based on speech probability.
             float gain =
                     0.5f * (1.f + static_cast<float>(tanh(2.f * avg_prob_speech - 1.f)));
-
             // Combine gain with low band gain.
             if (avg_prob_speech >= 0.5f) {
                 gain = 0.25f * gain + 0.75f * avg_filter_gain;
             } else {
                 gain = 0.5f * gain + 0.5f * avg_filter_gain;
             }
-
             // Make sure gain is within flooring range.
             return std::min(std::max(gain, minimum_attenuating_gain), 1.f);
         }
-
     }  // namespace
-
     NoiseSuppressor::ChannelState::ChannelState(
             const SuppressionParams &suppression_params,
             size_t num_bands)
@@ -247,7 +236,7 @@ namespace webrtc {
         prev_analysis_signal_spectrum.fill(1.f);
         process_analysis_memory.fill(0.f);
         process_synthesis_memory.fill(0.f);
-        for (auto &d : process_delay_memory) {
+        for (auto &d: process_delay_memory) {
             d.fill(0.f);
         }
     }
@@ -274,11 +263,9 @@ namespace webrtc {
         rtc::ArrayView<const float, kFftSizeBy2Plus1> filter0 =
                 channels_[0]->wiener_filter.get_filter();
         std::copy(filter0.begin(), filter0.end(), filter.begin());
-
         for (size_t ch = 1; ch < num_channels_; ++ch) {
             rtc::ArrayView<const float, kFftSizeBy2Plus1> filter_ch =
                     channels_[ch]->wiener_filter.get_filter();
-
             for (size_t k = 0; k < kFftSizeBy2Plus1; ++k) {
                 filter[k] = std::min(filter[k], filter_ch[k]);
             }
@@ -290,7 +277,6 @@ namespace webrtc {
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             channels_[ch]->noise_estimator.PrepareAnalysis();
         }
-
         // Check for zero frames.
         bool zero_frame = true;
         for (size_t ch = 0; ch < num_channels_; ++ch) {
@@ -303,7 +289,6 @@ namespace webrtc {
                 break;
             }
         }
-
         if (zero_frame) {
             // We want to avoid updating statistics in this case:
             // Updating feature statistics when we have zeros only will cause
@@ -315,63 +300,51 @@ namespace webrtc {
             // what is speech.
             return;
         }
-
         // Only update analysis counter for frames that are properly analyzed.
         if (++num_analyzed_frames_ < 0) {
             num_analyzed_frames_ = 0;
         }
-
         // Analyze all channels.
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             std::unique_ptr<ChannelState> &ch_p = channels_[ch];
             rtc::ArrayView<const float, kNsFrameSize> y_band0(
                     &audio.split_bands_const(ch)[0][0], kNsFrameSize);
-
             // Form an extended frame and apply analysis filter bank windowing.
-            std::array<float, kFftSize> extended_frame{};
+            std::array<float, kFftSize> extended_frame;
             FormExtendedFrame(y_band0, ch_p->analyze_analysis_memory, extended_frame);
             ApplyFilterBankWindow(extended_frame);
-
             // Compute the magnitude spectrum.
-            std::array<float, kFftSize> real{};
-            std::array<float, kFftSize> imag{};
+            std::array<float, kFftSize> real;
+            std::array<float, kFftSize> imag;
             fft_.Fft(extended_frame, real, imag);
-
-            std::array<float, kFftSizeBy2Plus1> signal_spectrum{};
+            std::array<float, kFftSizeBy2Plus1> signal_spectrum;
             ComputeMagnitudeSpectrum(real, imag, signal_spectrum);
-
             // Compute energies.
             float signal_energy = 0.f;
             for (size_t i = 0; i < kFftSizeBy2Plus1; ++i) {
                 signal_energy += real[i] * real[i] + imag[i] * imag[i];
             }
             signal_energy /= kFftSizeBy2Plus1;
-
             float signal_spectral_sum = 0.f;
             for (size_t i = 0; i < kFftSizeBy2Plus1; ++i) {
                 signal_spectral_sum += signal_spectrum[i];
             }
-
             // Estimate the noise spectra and the probability estimates of speech
             // presence.
             ch_p->noise_estimator.PreUpdate(num_analyzed_frames_, signal_spectrum,
                                             signal_spectral_sum);
-
-            std::array<float, kFftSizeBy2Plus1> post_snr{};
-            std::array<float, kFftSizeBy2Plus1> prior_snr{};
+            std::array<float, kFftSizeBy2Plus1> post_snr;
+            std::array<float, kFftSizeBy2Plus1> prior_snr;
             ComputeSnr(ch_p->wiener_filter.get_filter(),
                        ch_p->prev_analysis_signal_spectrum, signal_spectrum,
                        ch_p->noise_estimator.get_prev_noise_spectrum(),
                        ch_p->noise_estimator.get_noise_spectrum(), prior_snr, post_snr);
-
             ch_p->speech_probability_estimator.Update(
                     num_analyzed_frames_, prior_snr, post_snr,
                     ch_p->noise_estimator.get_conservative_noise_spectrum(),
                     signal_spectrum, signal_spectral_sum, signal_energy);
-
             ch_p->noise_estimator.PostUpdate(
                     ch_p->speech_probability_estimator.get_probability(), signal_spectrum);
-
             // Store the magnitude spectrum to make it avalilable for the process
             // method.
             std::copy(signal_spectrum.begin(), signal_spectrum.end(),
@@ -381,16 +354,16 @@ namespace webrtc {
 
     void NoiseSuppressor::Process(AudioBuffer *audio) {
         // Select the space for storing data during the processing.
-        std::array<FilterBankState, kMaxNumChannelsOnStack> filter_bank_states_stack{};
+        std::array<FilterBankState, kMaxNumChannelsOnStack> filter_bank_states_stack;
         rtc::ArrayView<FilterBankState> filter_bank_states(
                 filter_bank_states_stack.data(), num_channels_);
-        std::array<float, kMaxNumChannelsOnStack> upper_band_gains_stack{};
+        std::array<float, kMaxNumChannelsOnStack> upper_band_gains_stack;
         rtc::ArrayView<float> upper_band_gains(upper_band_gains_stack.data(),
                                                num_channels_);
-        std::array<float, kMaxNumChannelsOnStack> energies_before_filtering_stack{};
+        std::array<float, kMaxNumChannelsOnStack> energies_before_filtering_stack;
         rtc::ArrayView<float> energies_before_filtering(
                 energies_before_filtering_stack.data(), num_channels_);
-        std::array<float, kMaxNumChannelsOnStack> gain_adjustments_stack{};
+        std::array<float, kMaxNumChannelsOnStack> gain_adjustments_stack;
         rtc::ArrayView<float> gain_adjustments(gain_adjustments_stack.data(),
                                                num_channels_);
         if (NumChannelsOnHeap(num_channels_) > 0) {
@@ -405,29 +378,22 @@ namespace webrtc {
             gain_adjustments =
                     rtc::ArrayView<float>(gain_adjustments_heap_.data(), num_channels_);
         }
-
         // Compute the suppression filters for all channels.
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             // Form an extended frame and apply analysis filter bank windowing.
             rtc::ArrayView<float, kNsFrameSize> y_band0(&audio->split_bands(ch)[0][0],
                                                         kNsFrameSize);
-
             FormExtendedFrame(y_band0, channels_[ch]->process_analysis_memory,
                               filter_bank_states[ch].extended_frame);
-
             ApplyFilterBankWindow(filter_bank_states[ch].extended_frame);
-
             energies_before_filtering[ch] =
                     ComputeEnergyOfExtendedFrame(filter_bank_states[ch].extended_frame);
-
             // Perform filter bank analysis and compute the magnitude spectrum.
             fft_.Fft(filter_bank_states[ch].extended_frame, filter_bank_states[ch].real,
                      filter_bank_states[ch].imag);
-
-            std::array<float, kFftSizeBy2Plus1> signal_spectrum{};
+            std::array<float, kFftSizeBy2Plus1> signal_spectrum;
             ComputeMagnitudeSpectrum(filter_bank_states[ch].real,
                                      filter_bank_states[ch].imag, signal_spectrum);
-
             // Compute the frequency domain gain filter for noise attenuation.
             channels_[ch]->wiener_filter.Update(
                     num_analyzed_frames_,
@@ -435,11 +401,9 @@ namespace webrtc {
                     channels_[ch]->noise_estimator.get_prev_noise_spectrum(),
                     channels_[ch]->noise_estimator.get_parametric_noise_spectrum(),
                     signal_spectrum);
-
             if (num_bands_ > 1) {
                 // Compute the time-domain gain for attenuating the noise in the upper
                 // bands.
-
                 upper_band_gains[ch] = ComputeUpperBandsGain(
                         suppression_params_.minimum_attenuating_gain,
                         channels_[ch]->wiener_filter.get_filter(),
@@ -447,16 +411,19 @@ namespace webrtc {
                         channels_[ch]->prev_analysis_signal_spectrum, signal_spectrum);
             }
         }
-
+        // Only do the below processing if the output of the audio processing module
+        // is used.
+        if (!capture_output_used_) {
+            return;
+        }
         // Aggregate the Wiener filters for all channels.
-        std::array<float, kFftSizeBy2Plus1> filter_data{};
+        std::array<float, kFftSizeBy2Plus1> filter_data;
         rtc::ArrayView<const float, kFftSizeBy2Plus1> filter = filter_data;
         if (num_channels_ == 1) {
             filter = channels_[0]->wiener_filter.get_filter();
         } else {
             AggregateWienerFilters(filter_data);
         }
-
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             // Apply the filter to the lower band.
             for (size_t i = 0; i < kFftSizeBy2Plus1; ++i) {
@@ -464,20 +431,16 @@ namespace webrtc {
                 filter_bank_states[ch].imag[i] *= filter[i];
             }
         }
-
         // Perform filter bank synthesis
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             fft_.Ifft(filter_bank_states[ch].real, filter_bank_states[ch].imag,
                       filter_bank_states[ch].extended_frame);
         }
-
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             const float energy_after_filtering =
                     ComputeEnergyOfExtendedFrame(filter_bank_states[ch].extended_frame);
-
             // Apply synthesis window.
             ApplyFilterBankWindow(filter_bank_states[ch].extended_frame);
-
             // Compute the adjustment of the noise attenuation filter based on the
             // effect of the attenuation.
             gain_adjustments[ch] =
@@ -486,7 +449,6 @@ namespace webrtc {
                             channels_[ch]->speech_probability_estimator.get_prior_probability(),
                             energies_before_filtering[ch], energy_after_filtering);
         }
-
         // Select and apply adjustment of the noise attenuation filter based on the
         // effect of the attenuation.
         float gain_adjustment = gain_adjustments[0];
@@ -499,7 +461,6 @@ namespace webrtc {
                         gain_adjustment * filter_bank_states[ch].extended_frame[i];
             }
         }
-
         // Use overlap-and-add to form the output frame of the lowest band.
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             rtc::ArrayView<float, kNsFrameSize> y_band0(&audio->split_bands(ch)[0][0],
@@ -507,14 +468,12 @@ namespace webrtc {
             OverlapAndAdd(filter_bank_states[ch].extended_frame,
                           channels_[ch]->process_synthesis_memory, y_band0);
         }
-
         if (num_bands_ > 1) {
             // Select the noise attenuating gain to apply to the upper band.
             float upper_band_gain = upper_band_gains[0];
             for (size_t ch = 1; ch < num_channels_; ++ch) {
                 upper_band_gain = std::min(upper_band_gain, upper_band_gains[ch]);
             }
-
             // Process the upper bands.
             for (size_t ch = 0; ch < num_channels_; ++ch) {
                 for (size_t b = 1; b < num_bands_; ++b) {
@@ -522,10 +481,9 @@ namespace webrtc {
                     // the lowest band.
                     rtc::ArrayView<float, kNsFrameSize> y_band(
                             &audio->split_bands(ch)[b][0], kNsFrameSize);
-                    std::array<float, kNsFrameSize> delayed_frame{};
+                    std::array<float, kNsFrameSize> delayed_frame;
                     DelaySignal(y_band, channels_[ch]->process_delay_memory[b - 1],
                                 delayed_frame);
-
                     // Apply the time-domain noise-attenuating gain.
                     for (size_t j = 0; j < kNsFrameSize; j++) {
                         y_band[j] = upper_band_gain * delayed_frame[j];
@@ -533,7 +491,6 @@ namespace webrtc {
                 }
             }
         }
-
         // Limit the output the allowed range.
         for (size_t ch = 0; ch < num_channels_; ++ch) {
             for (size_t b = 0; b < num_bands_; ++b) {
@@ -545,5 +502,4 @@ namespace webrtc {
             }
         }
     }
-
-}  // namespace webrtc
+} // namespace webrtc

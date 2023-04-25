@@ -16,6 +16,7 @@
             <option value="$PROJECT_DIR$/lame" />
             <option value="$PROJECT_DIR$/soundTouch" />
             <option value="$PROJECT_DIR$/tools" />
+            <option value="$PROJECT_DIR$/webrtc-ns" />
           </set>
         </option>
       </GradleProjectSettings>

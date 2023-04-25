@@ -237,7 +237,7 @@ namespace webrtc {
         }
     }
 
-
+// 重采样器仅支持反向流中的 48kHz 至 16kHz
 // The resampler is only for supporting 48kHz to 16kHz in the reverse stream.
     void AudioBuffer::CopyFrom(const int16_t *const interleaved_data,
                                const StreamConfig &stream_config) {

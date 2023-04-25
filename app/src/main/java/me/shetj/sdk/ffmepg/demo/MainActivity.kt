@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.launch
 import me.shetj.ffmpeg.FFmpegKit
 import me.shetj.ffmpeg.FFmpegState
@@ -35,8 +36,8 @@ class MainActivity : AppCompatActivity() {
 
         // Example of a call to a native method
         try {
-            STKit.getInstance().init(2, 44100, 1f, 10f, 1f)
-            LameUtils.init(44100, 1, 44100, 64, 3, 3000, 200, false,true)
+//            STKit.getInstance().init(2, 44100, 1f, 10f, 1f)
+//            LameUtils.init(44100, 1, 44100, 64, 3, 3000, 200, false,true)
             binding.sampleText.text = stringFromJNI() +
                     "\nLame:" + LameUtils.version() +
                     "\nSoundTouch:${STKit.getInstance().getVersion()}" +
@@ -88,6 +89,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        binding.webRTCNS.setOnClickListener {
+            WebRtcNSActivity.start(this)
         }
     }
 

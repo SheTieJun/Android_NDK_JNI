@@ -22,12 +22,16 @@
 
 ### [curl 、openssl 和jsoncpp](tools)
 #### curl：C中请求网络很好的库，项目地址：
-https://github.com/curl/curl
-[curlAPI文档](https://curl.se/libcurl/c/)
+- https://github.com/curl/curl
+- [curlAPI文档](https://curl.se/libcurl/c/)
 
 #### openssl
-[https://github.com/openssl/openssl](https://github.com/openssl/openssl)
+- [https://github.com/openssl/openssl](https://github.com/openssl/openssl)
 
 #### jsoncpp：c++中解析json很方便的库，项目地址：
-https://github.com/open-source-parsers/jsoncpp
-[jsoncpp文档](http://open-source-parsers.github.io/jsoncpp-docs/doxygen/index.html)
+- https://github.com/open-source-parsers/jsoncpp
+- [jsoncpp文档](http://open-source-parsers.github.io/jsoncpp-docs/doxygen/index.html)
+
+### [WebRTC噪音模块](webrtc-ns)
+- 源码部分：https://webrtc.googlesource.com/src/+/refs/heads/main/modules/audio_processing/ns
+- 官网：https://webrtc.org/

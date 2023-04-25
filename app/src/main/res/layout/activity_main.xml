@@ -34,6 +34,13 @@
             app:layout_constraintTop_toTopOf="parent"
             android:textAllCaps="false"
             android:text="ffmpegKit"/>
+
+        <Button
+            android:id="@+id/webRTC_NS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAllCaps="false"
+            android:text="WebRTC-NS"/>
     </com.google.android.material.chip.ChipGroup>
 
 
