@@ -26,7 +26,7 @@ Java_com_shetj_webrtc_ns_WebRtcNs_webRtcNsCreate(JNIEnv *env, jobject thiz, jint
         cfg.target_level = NsConfig::SuppressionLevel::k18dB;
     else if (level == 3)
         cfg.target_level = NsConfig::SuppressionLevel::k21dB;
-    NoiseSuppressor *ns = new NoiseSuppressor(cfg, sampleRate, num_channels);
+    auto ns = new NoiseSuppressor(cfg, sampleRate, num_channels);
     return (jlong) ns;
 }
 
@@ -40,13 +40,13 @@ Java_com_shetj_webrtc_ns_WebRtcNs_noiseSuppressionByBytes(JNIEnv *env, jobject t
                                                           jlong ab_handler, jlong sc_handler,
                                                           jbyteArray inputbuffer) {
 
-    NoiseSuppressor *ns = (NoiseSuppressor *) ns_handler;
-    AudioBuffer *audio = (AudioBuffer *) ab_handler;
-    StreamConfig *stream_config = (StreamConfig *) sc_handler;
+    auto *ns = (NoiseSuppressor *) ns_handler;
+    auto *audio = (AudioBuffer *) ab_handler;
+    auto *stream_config = (StreamConfig *) sc_handler;
 
     jbyte *input = env->GetByteArrayElements(inputbuffer, NULL);
 
-    jshort *input_short = (jshort *) input;
+    auto *input_short = (jshort *) input;
     int sampleRate  = stream_config->sample_rate_hz();
 
     bool split_bands = sampleRate > 16000;
@@ -73,9 +73,9 @@ Java_com_shetj_webrtc_ns_WebRtcNs_noiseSuppressionByShort(JNIEnv *env, jobject t
                                                           jlong ab_handler, jlong sc_handler,
                                                           jshortArray inputbuffer) {
 
-    NoiseSuppressor *ns = (NoiseSuppressor *) ns_handler;
-    AudioBuffer *audio = (AudioBuffer *) ab_handler;
-    StreamConfig *stream_config = (StreamConfig *) sc_handler;
+    auto *ns = (NoiseSuppressor *) ns_handler;
+    auto *audio = (AudioBuffer *) ab_handler;
+    auto *stream_config = (StreamConfig *) sc_handler;
 
     jshort *input = env->GetShortArrayElements(inputbuffer, NULL);
     int sampleRate  = stream_config->sample_rate_hz();
@@ -100,7 +100,7 @@ JNIEXPORT jlong JNICALL
 Java_com_shetj_webrtc_ns_WebRtcNs_createAudioBuffer(JNIEnv *env, jobject thiz, jint sampleRate,
                                                     jint num_channels) {
 
-    AudioBuffer *audio = new AudioBuffer(sampleRate, num_channels,
+    auto *audio = new AudioBuffer(sampleRate, num_channels,
                                          sampleRate, num_channels,
                                          sampleRate, num_channels);
     return (jlong) audio;
@@ -110,7 +110,7 @@ JNIEXPORT jlong JNICALL
 Java_com_shetj_webrtc_ns_WebRtcNs_createStreamConfig(JNIEnv *env, jobject thiz, jint sample_rate,
                                                      jint num_channels) {
 
-    StreamConfig *stream_config = new StreamConfig(sample_rate, num_channels);
+    auto *stream_config = new StreamConfig(sample_rate, num_channels);
     return (jlong) stream_config;
 }
 extern "C"
@@ -118,9 +118,9 @@ JNIEXPORT void JNICALL
 Java_com_shetj_webrtc_ns_WebRtcNs_webRtcNsFree(JNIEnv *env, jobject thiz, jlong ns_handler,
                                                jlong ab_handler, jlong sc_handler) {
 
-    NoiseSuppressor *ns = (NoiseSuppressor *) ns_handler;
-    AudioBuffer *audio = (AudioBuffer *) ab_handler;
-    StreamConfig *stream_config = (StreamConfig *) sc_handler;
+    auto *ns = (NoiseSuppressor *) ns_handler;
+    auto *audio = (AudioBuffer *) ab_handler;
+    auto *stream_config = (StreamConfig *) sc_handler;
     free(ns);
     free(audio);
     free(stream_config);

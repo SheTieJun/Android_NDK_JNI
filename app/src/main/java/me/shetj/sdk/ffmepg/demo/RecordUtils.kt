@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import me.shetj.ndk.lame.LameUtils
 import me.shetj.player.PlayerListener
 import me.shetj.recorder.core.*
 import me.shetj.recorder.mixRecorder.buildMix
@@ -243,6 +244,8 @@ class RecordUtils(
     override fun onBeforePCMToMp3(pcm: ShortArray): ShortArray {
         if (isOpenWebRtcNS){
             WebRtcNsKit.noiseSuppressionByShort(pcm)
+        }else{
+
         }
         return pcm
     }

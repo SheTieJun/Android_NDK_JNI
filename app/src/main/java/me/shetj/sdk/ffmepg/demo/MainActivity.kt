@@ -15,6 +15,7 @@ import me.shetj.sdk.curl.CUrlKit
 import me.shetj.sdk.curl.CurlHttp
 import me.shetj.sdk.ffmepg.demo.databinding.ActivityMainBinding
 import me.shetj.sdk.json.JsonKit
+import me.shetj.sdk.utils.Uitls
 import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
@@ -38,10 +39,28 @@ class MainActivity : AppCompatActivity() {
         try {
 //            STKit.getInstance().init(2, 44100, 1f, 10f, 1f)
 //            LameUtils.init(44100, 1, 44100, 64, 3, 3000, 200, false,true)
-            binding.sampleText.text = stringFromJNI() +
-                    "\nLame:" + LameUtils.version() +
-                    "\nSoundTouch:${STKit.getInstance().getVersion()}" +
-                    "\n${CUrlKit.getVersion()}"
+            binding.sampleText.text =
+                """
+                    ${stringFromJNI()}
+                    Lame:" + ${LameUtils.version()}
+                    SoundTouch:${STKit.getInstance().getVersion()}
+                    ${CUrlKit.getVersion()}
+                    getPackageName = ${Uitls.getPackageName()}
+                    verificationPkg = ${Uitls.verificationPkg()}
+                    verificationSign = ${Uitls.verificationSign(this)}
+                    AppSigning.MD5 = ${AppSigning.getSignInfo(this,AppSigning.MD5)}
+                    AppSigning.SHA1 = ${AppSigning.getSignInfo(this,AppSigning.SHA1)}
+                    AppSigning.SHA256 = ${AppSigning.getSignInfo(this,AppSigning.SHA256)}
+                """.trimIndent()
+
+            "${AppSigning.getSignature(this)}".let {
+                if (it.length > 100){
+                    //分开输出
+                    it.chunked(100).forEach {
+                        Log.i("AppSigning", it)
+                    }
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -61,10 +80,12 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, testPost, Toast.LENGTH_SHORT).show()
         }
         binding.testJson.setOnClickListener {
-
             JsonKit.test()
         }
 
+        binding.getAppSigning.setOnClickListener {
+            Uitls.verificationSign(this)
+        }
 
         binding.ffmpegKit.setOnClickListener {
             lifecycleScope.launch {

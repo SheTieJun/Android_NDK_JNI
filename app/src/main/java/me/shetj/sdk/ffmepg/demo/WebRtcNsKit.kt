@@ -1,12 +1,8 @@
 package me.shetj.sdk.ffmepg.demo
 
+import android.util.Log
 import com.shetj.webrtc.ns.WebRtcNs
 
-/**
- *
- * <b>@author：</b> shetj<br>
- * <b>@createTime：</b> 2023/4/24<br>
- */
 object WebRtcNsKit {
 
     private var nsHandler: Long = -1
@@ -27,12 +23,18 @@ object WebRtcNsKit {
 
 
     fun noiseSuppressionByBytes(inputbuffer: ByteArray) {
-        if (nsHandler == -1L) return
+        if (nsHandler == -1L) {
+            Log.e("WebRtcNsKit","nsHandler == -1L,please call create() before")
+            return
+        }
         WebRtcNs.noiseSuppressionByBytes(nsHandler,abHandler,scHandler, inputbuffer)
     }
 
     fun noiseSuppressionByShort(inputbuffer: ShortArray) {
-        if (nsHandler == -1L) return
+        if (nsHandler == -1L){
+            Log.e("WebRtcNsKit","nsHandler == -1L,please call create() before")
+            return
+        }
         WebRtcNs.noiseSuppressionByShort(nsHandler,abHandler,scHandler, inputbuffer)
     }
 

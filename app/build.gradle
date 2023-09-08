@@ -21,15 +21,27 @@ android {
         }
     }
 
+    signingConfigs{
+        release {
+            storeFile file("test.jks")
+            storePassword "123456"
+            keyAlias "shetj"
+            keyPassword "123456"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             jniDebuggable false
             debuggable false
+            signingConfig signingConfigs.release
         }
         debug {
             jniDebuggable true
+            debuggable true
+            signingConfig signingConfigs.release
         }
     }
     compileOptions {
@@ -49,7 +61,7 @@ android {
         viewBinding true
     }
     sourceSets.main {
-        jni.srcDirs=['src/main/cpp']
+        jniLibs.srcDirs=['src/main/cpp']
     }
 
 }
