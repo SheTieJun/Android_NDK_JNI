@@ -2,7 +2,7 @@ package me.shetj.sdk.utils
 
 import android.content.Context
 
-class Uitls {
+class Utils {
 
 
     companion object{
@@ -14,6 +14,7 @@ class Uitls {
         @JvmStatic
         external fun getPackageName():String
 
+        @JvmStatic
         external fun verificationPkg():String
 
         @JvmStatic

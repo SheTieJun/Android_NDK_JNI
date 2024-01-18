@@ -20,6 +20,8 @@ ext.sdk_version = '1.0.0'
 
 ext.local_group_id = 'com.shetj.android-ndk'
 
+ext.ndk_version ="21.4.7075529"
+
 
 subprojects {
 

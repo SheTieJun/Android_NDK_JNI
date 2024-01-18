@@ -1,7 +1,6 @@
 #include <jni.h>
 #include <string>
 #include "LogKit.h"
-#include "Register.h"
 
 #include <iostream>
 #include <dirent.h>
@@ -112,6 +111,11 @@ JNIEXPORT jstring JNICALL Java_me_shetj_sdk_ffmepg_demo_MainActivity_stringFromJ
 	return env->NewStringUTF(hello.c_str());
 }
 
+/**
+ * 测试线程
+ * @param data
+ * @return
+ */
 
 static void *test(void *data) {
 	int status;

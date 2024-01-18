@@ -41,16 +41,16 @@ bool HttpModule::SetTimeOut(unsigned short usSecond)
 	return  checkResult(m_curlCode);
 }
 
-bool HttpModule::SetURL(const std::string  strURL)
+bool HttpModule::SetURL(const std::string&  strURL)
 {
-	if (m_pCurl == NULL)
+	if (m_pCurl == nullptr)
 		return false;
 	m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_URL, strURL.c_str());
 	return  checkResult(m_curlCode);
 }
 bool HttpModule::SetHttpHead(const string& strHttpHead)
 {
-	if (m_pCurl == NULL)
+	if (m_pCurl == nullptr)
 		return false;
 	headers = curl_slist_append(headers, strHttpHead.c_str());
 	m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_HTTPHEADER, headers);
@@ -58,7 +58,7 @@ bool HttpModule::SetHttpHead(const string& strHttpHead)
 }
 bool HttpModule::SetResponseStr(std::string & strResponse)
 {
-	if (m_pCurl == NULL){
+	if (m_pCurl == nullptr){
 		LOGE("Failed to create CURL object");
 		return false;
 	}
@@ -67,14 +67,14 @@ bool HttpModule::SetResponseStr(std::string & strResponse)
     return  checkResult(m_curlCode);
 }
 
-CURLcode HttpModule::SendRequest(void) {
-	if (m_pCurl == NULL)
+CURLcode HttpModule::SendRequest() const {
+	if (m_pCurl == nullptr)
 		return CURLE_FAILED_INIT;
 	return curl_easy_perform(m_pCurl);
 }
 
 bool HttpModule::SetMethod(const string method) {
-	if (m_pCurl == NULL){
+	if (m_pCurl == nullptr){
 		LOGE("Failed to create CURL object");
 		return false;
 	}
@@ -90,8 +90,8 @@ bool HttpModule::SetMethod(const string method) {
 	return false;
 }
 
-bool HttpModule::SetPostJson(std::string szJson) {
-	if (m_pCurl == NULL){
+bool HttpModule::SetPostJson(const std::string& szJson) {
+	if (m_pCurl == nullptr){
 		LOGE("Failed to create CURL object");
 		return false;
 	}
@@ -100,18 +100,18 @@ bool HttpModule::SetPostJson(std::string szJson) {
 	return 	checkResult(m_curlCode);
 }
 
-bool HttpModule::SetCertificate(std::string cacert_path) {
-	if (m_pCurl == NULL){
+bool HttpModule::SetCertificate(const std::string& cacert_path) const {
+	if (m_pCurl == nullptr){
 		LOGE("Failed to create CURL object");
 		return false;
 	}
-	CURLcode m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_CAINFO, cacert_path.c_str());
-	return checkResult(m_curlCode);
+	CURLcode curlCode = curl_easy_setopt(m_pCurl, CURLOPT_CAINFO, cacert_path.c_str());
+	return checkResult(curlCode);
 }
 
-bool HttpModule::checkResult(CURLcode &m_curlCode) const {
-	if (m_curlCode != CURLE_OK) {
-		LOGE("curl_easy_setopt failed: %s",curl_easy_strerror(m_curlCode));
+bool HttpModule::checkResult(CURLcode &curLcode) {
+	if (curLcode != CURLE_OK) {
+		LOGE("curl_easy_setopt failed: %s",curl_easy_strerror(curLcode));
 		return false;
 	}
 	return true;
@@ -180,7 +180,7 @@ bool HttpModule::AddHeader(std::string Key, std::string Value) {
 	return checkResult(m_curlCode);
 }
 
-bool HttpModule::SetCookie(std::string Cookie) {
+bool HttpModule::SetCookie(const std::string& Cookie) {
 	if (Cookie.empty())
 		return false;
 	m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_COOKIE, Cookie.c_str());

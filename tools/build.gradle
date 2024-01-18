@@ -51,7 +51,7 @@ android {
     buildFeatures {
         prefab true
     }
-
+    ndkVersion(ndk_version)
 }
 
 dependencies {

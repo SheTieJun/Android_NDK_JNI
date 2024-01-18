@@ -5,7 +5,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.NonCancellable.start
 import kotlinx.coroutines.launch
 import me.shetj.ffmpeg.FFmpegKit
 import me.shetj.ffmpeg.FFmpegState
@@ -15,7 +14,7 @@ import me.shetj.sdk.curl.CUrlKit
 import me.shetj.sdk.curl.CurlHttp
 import me.shetj.sdk.ffmepg.demo.databinding.ActivityMainBinding
 import me.shetj.sdk.json.JsonKit
-import me.shetj.sdk.utils.Uitls
+import me.shetj.sdk.utils.Utils
 import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
@@ -45,18 +44,15 @@ class MainActivity : AppCompatActivity() {
                     Lame:" + ${LameUtils.version()}
                     SoundTouch:${STKit.getInstance().getVersion()}
                     ${CUrlKit.getVersion()}
-                    getPackageName = ${Uitls.getPackageName()}
-                    verificationPkg = ${Uitls.verificationPkg()}
-                    verificationSign = ${Uitls.verificationSign(this)}
-                    AppSigning.MD5 = ${AppSigning.getSignInfo(this,AppSigning.MD5)}
-                    AppSigning.SHA1 = ${AppSigning.getSignInfo(this,AppSigning.SHA1)}
-                    AppSigning.SHA256 = ${AppSigning.getSignInfo(this,AppSigning.SHA256)}
+                    getPackageName = ${Utils.getPackageName()}
+                    verificationPkg = ${Utils.verificationPkg()}
+                    verificationSign = ${Utils.verificationSign(this)}
                 """.trimIndent()
 
             "${AppSigning.getSignature(this)}".let {
-                if (it.length > 100){
+                if (it.length > 200){
                     //分开输出
-                    it.chunked(100).forEach {
+                    it.chunked(200).forEach {
                         Log.i("AppSigning", it)
                     }
                 }
@@ -84,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.getAppSigning.setOnClickListener {
-            Uitls.verificationSign(this)
+            Utils.verificationSign(this)
         }
 
         binding.ffmpegKit.setOnClickListener {

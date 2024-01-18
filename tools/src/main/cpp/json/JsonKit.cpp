@@ -28,15 +28,15 @@ void JsonKit::addValue(std::string key, bool value) {
     root[key.c_str()] = value;
 }
 
-void JsonKit::addValue(std::string key, int value) {
+void JsonKit::addValue(const std::string& key, int value) {
     root[key.c_str()] = value;
 }
 
-void JsonKit::addValue(std::string key, Json::Value value) {
+void JsonKit::addValue(const std::string& key, Json::Value value) {
     root[key.c_str()] = value;
 }
 
-std::string JsonKit::toJsonString() {
+std::string JsonKit::toJsonString() const {
     Json::StreamWriterBuilder writerBuilder;
     std::ostringstream os;
     writerBuilder["emitUTF8"] = true;
@@ -45,7 +45,7 @@ std::string JsonKit::toJsonString() {
     return os.str();
 }
 
-void JsonKit::createByString(std::string document) {
+void JsonKit::createByString(const std::string& document) {
     Json::CharReaderBuilder reader;
     JSONCPP_STRING errs;
     std::unique_ptr<Json::CharReader> const jsonReader(reader.newCharReader());

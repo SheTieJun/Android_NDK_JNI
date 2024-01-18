@@ -28,7 +28,6 @@ string utils::jString2String(JNIEnv *env,jstring jStr) {
         return "";
     typedef std::unique_ptr<const char[], std::function<void(const char *)>>
             JniString;
-
     JniString cstr(env->GetStringUTFChars(jStr, nullptr), [=](const char *p) {
         env->ReleaseStringUTFChars(jStr, p);
     });
@@ -79,7 +78,7 @@ jstring getPackageName(JNIEnv *env) {
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_me_shetj_sdk_utils_Uitls_getPackageName(JNIEnv *env, jclass clazz) {
+Java_me_shetj_sdk_utils_Utils_getPackageName(JNIEnv *env, jclass clazz) {
     return getPackageName(env);
 }
 
@@ -106,7 +105,7 @@ const char* RELEASE_PACKAGE = "me.shetj.sdk.ffmepg.demo";
 
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_me_shetj_sdk_utils_Uitls_verificationSign(JNIEnv *env, jclass clazz, jobject context) {
+Java_me_shetj_sdk_utils_Utils_verificationSign(JNIEnv *env, jclass clazz, jobject context) {
 
     jclass context_class = env->GetObjectClass(context);
 
@@ -165,9 +164,10 @@ Java_me_shetj_sdk_utils_Uitls_verificationSign(JNIEnv *env, jclass clazz, jobjec
     }
 
 }
+
 extern "C"
 JNIEXPORT jstring JNICALL
-Java_me_shetj_sdk_utils_Uitls_00024Companion_verificationPkg(JNIEnv *env, jobject thiz) {
+Java_me_shetj_sdk_utils_Utils_verificationPkg(JNIEnv *env, jclass clazz) {
     jstring packageName = getPackageName(env);
     const char* c_pkg = (char*)env->GetStringUTFChars(packageName, 0);
     if(strcmp(c_pkg, RELEASE_PACKAGE)==0) {

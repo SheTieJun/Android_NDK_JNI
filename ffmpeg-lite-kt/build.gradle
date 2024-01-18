@@ -32,6 +32,7 @@ android {
             jniLibs.srcDirs = ['libs']
         }
     }
+    ndkVersion(ndk_version)
 }
 
 dependencies {

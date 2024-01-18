@@ -1,8 +1,13 @@
 //
 // Created by stj on 2021/11/4.
+// 测试代码。
 //
 
+#include <cstring>
 #include "Register.h"
+#include "LogKit.h"
+
+#define NELEM(arr) (sizeof(arr) / sizeof(arr[0]))
 
 int find_class(JNIEnv *env, const char *name, jclass *clazz_out) {
 	jclass clazz = env->FindClass(name);

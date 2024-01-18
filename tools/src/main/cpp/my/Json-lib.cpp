@@ -8,7 +8,7 @@
 
 extern "C" JNIEXPORT void JNICALL
 Java_me_shetj_sdk_json_JsonKit_test(JNIEnv *env, jclass clazz) {
-    JsonKit tool;
+    JsonKit tool = JsonKit();
 //    string s = " {\n"
 //               "    \t\"bool\" : false,\n"
 //               "    \t\"int\" : 1,\n"

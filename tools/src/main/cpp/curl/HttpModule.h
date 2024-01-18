@@ -48,12 +48,12 @@ public:
     bool SetMethod(const string method);
 
     //设置 请求的url
-    bool SetURL(const std::string strURL);
+    bool SetURL(const std::string& strURL);
 
     //设置post的json 需要SetMethod（post）
-    bool SetPostJson(std::string json);
+    bool SetPostJson(const std::string& json);
 
-    bool SetCertificate(std::string path);
+    bool SetCertificate(const std::string& path) const;
 
     //忽略证书
     bool ignoreSSL();
@@ -68,10 +68,10 @@ public:
     bool SetResponseStr(std::string &strResponse);
 
     //设置HTTP请求cookie
-    bool SetCookie(std::string lpCookie);
+    bool SetCookie(const std::string& lpCookie);
 
     //发送http请求
-    CURLcode SendRequest(void);
+    CURLcode SendRequest() const;
 
 
 public:
@@ -79,7 +79,7 @@ public:
     long m_nPort = 80;
     CURLcode m_curlCode = CURLE_OK;
     struct curl_slist *headers = NULL;
-    bool checkResult(CURLcode &res) const;
+    static bool checkResult(CURLcode &curLcode) ;
 };
 //NetModule end
 

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
+    compileSdk 31
     defaultConfig {
         applicationId "me.shetj.sdk.ffmepg.demo"
         minSdkVersion 21
@@ -64,6 +64,7 @@ android {
         jniLibs.srcDirs=['src/main/cpp']
     }
 
+    ndkVersion(ndk_version)
 }
 
 dependencies {

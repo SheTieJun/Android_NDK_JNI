@@ -21,19 +21,19 @@ public:
 
 public:
 
-    void createByString(std::string document);
+    void createByString(const std::string& document);
 
     void addValue(std::string key, std::string value);
 
     void addValue(std::string key, bool value);
 
-    void addValue(std::string key, int value);
+    void addValue(const std::string& key, int value);
 
-    void addValue(std::string key, Json::Value value);
+    void addValue(const std::string& key, Json::Value value);
 
     void removeValue(std::string key);
 
-    std::string toJsonString();
+    std::string toJsonString() const;
 
 public:
     Json::Value root;

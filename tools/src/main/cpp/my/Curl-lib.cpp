@@ -32,7 +32,7 @@ Java_me_shetj_sdk_curl_CUrlKit_postJson(JNIEnv *env, jobject thiz, jstring url, 
     post.SetHttpHead("content-type:application/json;charset=UTF-8");
     post.SetPostJson(utils::jString2String(env, json));
     post.SetResponseStr(buf);
-    post.SetURL(utils::jString2String(env, url).c_str());
+    post.SetURL(utils::jString2String(env, url));
     if(!Certificate_file.empty()){
         post.SetCertificate(Certificate_file);
     }else{
