@@ -109,26 +109,25 @@ CURLcode CurlTools::HttpPost(const std::string & strUrl, std::string szJson, std
         return CURLE_FAILED_INIT;
     }
 
-    CURLcode ret;
-    ret = curl_easy_setopt(pCURL, CURLOPT_URL, strUrl.c_str());
+    curl_easy_setopt(pCURL, CURLOPT_URL, strUrl.c_str());
     //    std::cout << ret << std::endl;
 
-    ret = curl_easy_setopt(pCURL, CURLOPT_POST, 1L);
+    res = curl_easy_setopt(pCURL, CURLOPT_POST, 1L);
     headers = curl_slist_append(headers, "content-type:application/json");
 
     //不验证证书
     curl_easy_setopt(pCURL, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(pCURL, CURLOPT_SSL_VERIFYHOST, 0L);
 
-    ret = curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, headers);
+    res = curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, headers);
 
-    ret = curl_easy_setopt(pCURL, CURLOPT_POSTFIELDS, szJsonData);
+    res = curl_easy_setopt(pCURL, CURLOPT_POSTFIELDS, szJsonData);
     //curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
-    ret = curl_easy_setopt(pCURL, CURLOPT_TIMEOUT, nTimeout);
+    res = curl_easy_setopt(pCURL, CURLOPT_TIMEOUT, nTimeout);
 
-    ret = curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, CurlTools::receive_data);
+    res = curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, CurlTools::receive_data);
 
-    ret = curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, (void*)&strResponse);
+    res = curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, (void*)&strResponse);
 
     res = curl_easy_perform(pCURL);
     curl_easy_cleanup(pCURL);

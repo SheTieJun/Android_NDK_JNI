@@ -4,11 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 31
+    compileSdk 35
+    namespace "me.shetj.sdk.ffmepg.demo"
     defaultConfig {
         applicationId "me.shetj.sdk.ffmepg.demo"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
 
