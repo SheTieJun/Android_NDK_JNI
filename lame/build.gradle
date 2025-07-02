@@ -14,6 +14,7 @@ android {
                 abiFilters  'armeabi-v7a', 'arm64-v8a', 'x86_64', 'x86'
                 cppFlags "-frtti -fexceptions"
                 cFlags "-DSTDC_HEADERS" //宏定义
+//                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"//r27
             }
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
