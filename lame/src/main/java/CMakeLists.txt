@@ -1,5 +1,6 @@
 
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 3.22.1)
+project("shetj_mp3lame")
 
 #C 的编译选项是 CMAKE_C_FLAGS
 # 指定编译参数，可选
@@ -46,3 +47,5 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
+
+target_link_options(shetj_mp3lame PRIVATE "-Wl,-z,max-page-size=16384")

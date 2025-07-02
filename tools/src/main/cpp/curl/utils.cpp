@@ -3,8 +3,8 @@
 //
 
 #include "utils.h"
-
-
+#include <jni.h>
+#include <functional>
 
 
 bool utils::icompare_pred(unsigned char a, unsigned char b)

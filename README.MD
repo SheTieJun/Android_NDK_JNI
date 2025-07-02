@@ -35,3 +35,15 @@
 ### [WebRTC噪音模块](webrtc-ns)
 - 源码部分：https://webrtc.googlesource.com/src/+/refs/heads/main/modules/audio_processing/ns
 - 官网：https://webrtc.org/
+
+### 兼容 16KB,兼容Android 15
+```cmake
+#3.13 之前：
+target_link_libraries(xxx  "-Wl,-z,max-page-size=16384")
+#3.13之后
+target_link_options(xxx PRIVATE "-Wl,-z,max-page-size=16384")
+```
+在CMake 3.13之前，要向目标添加链接选项，您可以使用target_link_libraries命令，并将链接选项作为字符串传递给该命令。
+在CMake 3.13及更高版本中，引入了target_link_options命令，使得向目标添加链接选项更加直观和一致。
+ 
+

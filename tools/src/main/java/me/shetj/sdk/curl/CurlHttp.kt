@@ -24,7 +24,7 @@ object CurlHttp {
     }
 
     fun testGet(): String {
-       return curl.get("https://109cffaa-4442-49c0-b87d-3265b7dc2b3e.mock.pstmn.io/me.shet")
+       return curl.get("https://dummyjson.com/c/3029-d29f-4014-9fb4")
     }
 
     fun testPost(): String {

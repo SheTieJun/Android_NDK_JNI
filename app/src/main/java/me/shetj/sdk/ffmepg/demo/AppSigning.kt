@@ -27,7 +27,7 @@ object AppSigning {
             /******* 通过返回的包信息获得签名数组  */
             val signatures = packageInfo.signatures
             /******* 循环遍历签名数组拼接应用签名  */
-            return signatures[0].toCharsString()
+            return signatures?.get(0)?.toCharsString()
             /************** 得到应用签名  */
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()

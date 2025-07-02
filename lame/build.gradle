@@ -4,18 +4,17 @@ plugins {
 }
 
 android {
-    compileSdk 31
-
+    compileSdk 35
+    namespace "me.shetj.ndk.lame"
     defaultConfig {
         minSdk 21
-        targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        targetSdk 35
         externalNativeBuild {
             cmake{
                 abiFilters  'armeabi-v7a', 'arm64-v8a', 'x86_64', 'x86'
                 cppFlags "-frtti -fexceptions"
                 cFlags "-DSTDC_HEADERS" //宏定义
+//                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"//r27
             }
         }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -25,6 +24,7 @@ android {
     externalNativeBuild {
         cmake {
             path "src/main/java/CMakeLists.txt"  // 设置所要编写的c源码位置，以及编译后so文件的名字
+            version("3.22.1")
         }
     }
 
@@ -45,12 +45,6 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.3.2'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 }
 
 apply from : "uploadLocal.gradle"

@@ -5,7 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import me.shetj.ffmpeg.FFmpegKit
 import me.shetj.ffmpeg.FFmpegState
 import me.shetj.ffmpeg.convertToCommand
@@ -64,16 +66,22 @@ class MainActivity : AppCompatActivity() {
 
 
         binding.test.setOnClickListener {
-            CurlHttp.setCertificate(cacert)
-            //TODO 需要在线程
-            val testGet = CurlHttp.testGet()
-            Log.i("testGet", testGet)
-            Toast.makeText(this, testGet, Toast.LENGTH_SHORT).show()
+            lifecycleScope.launch(){
+                CurlHttp.setCertificate(cacert)
+                withContext(Dispatchers.IO){
+                   CurlHttp.testGet()
+                }.let {
+                    Log.i("testGet", it)
+                    Toast.makeText(this@MainActivity, it, Toast.LENGTH_SHORT).show()
+                }
+                withContext(Dispatchers.IO){
+                    CurlHttp.testPost()
+                }.let {
+                    Log.i("testPost", it)
+                    Toast.makeText(this@MainActivity, it, Toast.LENGTH_SHORT).show()
+                }
+            }
 
-            //
-            val testPost = CurlHttp.testPost()
-            Log.i("testPost", testPost)
-            Toast.makeText(this, testPost, Toast.LENGTH_SHORT).show()
         }
         binding.testJson.setOnClickListener {
             JsonKit.test()

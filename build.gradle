@@ -5,11 +5,10 @@ buildscript {
 }
 
 plugins {
-    id 'com.android.application' version '7.2.2' apply false
-    id 'com.android.library' version '7.2.2' apply false
-    id 'org.jetbrains.kotlin.android' version '1.7.10' apply false
+    id 'com.android.application' version '8.2.2' apply false
+    id 'com.android.library' version '8.2.2' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.20' apply false
     id 'maven-publish'
-    id 'com.google.devtools.ksp' version '1.5.31-1.0.1'
     id "com.diffplug.spotless" version "6.0.0"
 }
 
@@ -20,7 +19,7 @@ ext.sdk_version = '1.0.0'
 
 ext.local_group_id = 'com.shetj.android-ndk'
 
-ext.ndk_version ="21.4.7075529"
+ext.ndk_version ="29.0.13599879"
 
 
 subprojects {
