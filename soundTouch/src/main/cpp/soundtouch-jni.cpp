@@ -221,6 +221,49 @@ Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchSemiTones(JNIEnv *env, jobject t
 
 
 extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchOctaves(JNIEnv *env, jobject thiz,
+                                                        jlong handle, jfloat octaves) {
+    SoundTouch *pSoundTouch = (SoundTouch*)handle;
+    pSoundTouch->setPitchOctaves(octaves);
+}
+
+
+extern "C" DLL_PUBLIC void
+Java_me_shetj_ndk_soundtouch_SoundTouch_setPitch(JNIEnv *env, jobject thiz,
+                                                 jlong handle, jfloat pitch) {
+    try {
+        // 参数验证：pitch应大于0，建议限制在0.5-2.0范围内
+        if (pitch <= 0.0f) {
+            LOGV("JNI setPitch: Invalid pitch value %f, must be greater than 0", pitch);
+            _setErrmsg("Invalid pitch value: must be greater than 0");
+            return;
+        }
+        
+        if (pitch < 0.5f || pitch > 2.0f) {
+            LOGV("JNI setPitch: Warning - pitch value %f is outside recommended range (0.5-2.0)", pitch);
+        }
+        
+        // 验证SoundTouch实例是否有效
+        SoundTouch *pSoundTouch = (SoundTouch*)handle;
+        if (pSoundTouch == NULL) {
+            LOGV("JNI setPitch: SoundTouch instance is NULL");
+            _setErrmsg("SoundTouch instance is NULL, please initialize first");
+            return;
+        }
+        
+        // 调用SoundTouch库的setPitch函数
+        pSoundTouch->setPitch(pitch);
+        LOGV("JNI setPitch: Successfully set pitch to %f", pitch);
+        
+    } catch (const runtime_error &e) {
+        const char *err = e.what();
+        LOGV("JNI exception in SoundTouch::setPitch: %s", err);
+        _setErrmsg(err);
+    }
+}
+
+
+extern "C" DLL_PUBLIC void
 Java_me_shetj_ndk_soundtouch_SoundTouch_setRate(JNIEnv *env, jobject thiz,
                                                 jlong handle, jfloat speed) {
     SoundTouch *pSoundTouch = (SoundTouch*)handle;

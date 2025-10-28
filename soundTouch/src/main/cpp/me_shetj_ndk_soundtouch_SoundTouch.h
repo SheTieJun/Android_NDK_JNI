@@ -33,6 +33,22 @@ JNIEXPORT void JNICALL Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchSemiTones
 
 /*
  * Class:     me_shetj_ndk_soundtouch_SoundTouch
+ * Method:    setPitchOctaves
+ * Signature: (JF)V
+ */
+JNIEXPORT void JNICALL Java_me_shetj_ndk_soundtouch_SoundTouch_setPitchOctaves
+  (JNIEnv *, jobject, jlong, jfloat);
+
+/*
+ * Class:     me_shetj_ndk_soundtouch_SoundTouch
+ * Method:    setPitch
+ * Signature: (JF)V
+ */
+JNIEXPORT void JNICALL Java_me_shetj_ndk_soundtouch_SoundTouch_setPitch
+  (JNIEnv *, jobject, jlong, jfloat);
+
+/*
+ * Class:     me_shetj_ndk_soundtouch_SoundTouch
  * Method:    setSpeed
  * Signature: (JF)V
  */
