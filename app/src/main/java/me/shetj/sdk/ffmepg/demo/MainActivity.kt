@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
                     getPackageName = ${Utils.getPackageName()}
                     verificationPkg = ${Utils.verificationPkg()}
                     verificationSign = ${Utils.verificationSign(this)}
+                    \n
+                    getSecurityStatus = ${Utils.getSecurityStatus(this)}
                 """.trimIndent()
 
             "${AppSigning.getSignature(this)}".let {

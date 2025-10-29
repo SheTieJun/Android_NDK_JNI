@@ -19,6 +19,10 @@ HttpModule::HttpModule() :
 }
 HttpModule::~HttpModule()
 {
+	if (headers) {
+		curl_slist_free_all(headers);
+		headers = NULL;
+	}
 	curl_easy_cleanup(m_pCurl);
 	m_pCurl = NULL;
 }
@@ -86,7 +90,27 @@ bool HttpModule::SetMethod(const string method) {
 		m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_POST, 1L);
 		return  checkResult(m_curlCode);
 	}
-	LOGE("SetMethod: only support get and post");
+	if(utils::icasecompare(method,"put")){
+		m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "PUT");
+		return  checkResult(m_curlCode);
+	}
+	if(utils::icasecompare(method,"delete")){
+		m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "DELETE");
+		return  checkResult(m_curlCode);
+	}
+	if(utils::icasecompare(method,"head")){
+		m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_NOBODY, 1L);
+		return  checkResult(m_curlCode);
+	}
+	if(utils::icasecompare(method,"patch")){
+		m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "PATCH");
+		return  checkResult(m_curlCode);
+	}
+	if(utils::icasecompare(method,"options")){
+		m_curlCode = curl_easy_setopt(m_pCurl, CURLOPT_CUSTOMREQUEST, "OPTIONS");
+		return  checkResult(m_curlCode);
+	}
+	LOGE("SetMethod: unsupported method: %s", method.c_str());
 	return false;
 }
 

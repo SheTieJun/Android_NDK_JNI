@@ -176,3 +176,354 @@ Java_me_shetj_sdk_utils_Utils_verificationPkg(JNIEnv *env, jclass clazz) {
         return (env)->NewStringUTF("pkg error");
     }
 }
+
+// ==================== 新增安全校验功能实现 ====================
+
+#include <unistd.h>
+#include <sys/ptrace.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <algorithm>
+#include <sstream>
+#include <iomanip>
+#include <openssl/md5.h>
+#include <openssl/sha.h>
+
+/**
+ * 包名白名单 - 明文存储，高性能直接匹配算法
+ * 
+ * 算法特点：
+ * 1. 使用明文存储，避免加密解密开销
+ * 2. 直接字符串匹配，时间复杂度 O(n*m)，n为白名单数量，m为平均包名长度
+ * 3. 内存占用小，无需额外的加密密钥存储
+ * 4. 易于维护和调试，包名一目了然
+ * 5. 支持快速添加和移除包名
+ */
+static const char* PACKAGE_WHITELIST[] = {
+    "me.shetj.sdk.ffmepg.demo",
+    "me.shetj.sdk.ffmepg.demo.test",
+    "me.shetj.sdk.ffmepg.demo.dev",
+    nullptr
+};
+
+/**
+ * 获取包名白名单 - 明文白名单算法实现
+ * 
+ * 算法特点：
+ * 1. 直接返回明文包名列表，无需解密操作
+ * 2. 时间复杂度 O(n)，n为白名单数量
+ * 3. 内存效率高，直接复制字符串指针
+ * 4. 易于维护和调试
+ * 
+ * @return 包名白名单列表
+ */
+vector<string> utils::getPackageWhitelist() {
+    vector<string> whitelist;
+    whitelist.reserve(4); // 预分配内存，提高性能
+    
+    for (int i = 0; PACKAGE_WHITELIST[i] != nullptr; i++) {
+        whitelist.emplace_back(PACKAGE_WHITELIST[i]);
+    }
+    
+    return whitelist;
+}
+
+/**
+ * 获取包名白名单 - 兼容性接口
+ * 
+ * 为了保持向后兼容性，保留此函数名，但实现改为明文白名单
+ * 
+ * @return 包名白名单列表
+ */
+vector<string> utils::getEncryptedWhitelist() {
+    return getPackageWhitelist();
+}
+
+/**
+ * 包名白名单校验 - 高性能直接匹配算法
+ * 
+ * 算法特点：
+ * 1. 直接遍历明文白名单数组，避免创建临时vector
+ * 2. 使用C++标准库的字符串比较，性能优化
+ * 3. 时间复杂度 O(n*m)，n为白名单数量，m为平均包名长度
+ * 4. 空间复杂度 O(1)，无额外内存分配
+ * 5. 支持精确匹配，确保安全性
+ * 
+ * @param packageName 要检查的包名
+ * @return true 如果包名在白名单中，false 否则
+ */
+bool utils::isPackageInWhitelist(const string& packageName) {
+    // 参数验证
+    if (packageName.empty()) {
+        return false;
+    }
+    
+    // 直接遍历白名单数组进行匹配
+    for (int i = 0; PACKAGE_WHITELIST[i] != nullptr; i++) {
+        if (packageName == PACKAGE_WHITELIST[i]) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// 检查调试器是否附加
+bool utils::checkDebuggerAttached() {
+    // 方法1: 检查TracerPid
+    FILE* status = fopen("/proc/self/status", "r");
+    if (status) {
+        char line[256];
+        while (fgets(line, sizeof(line), status)) {
+            if (strncmp(line, "TracerPid:", 10) == 0) {
+                int tracerPid = atoi(line + 10);
+                fclose(status);
+                return tracerPid != 0;
+            }
+        }
+        fclose(status);
+    }
+    
+    // 方法2: ptrace自检
+    if (ptrace(PTRACE_TRACEME, 0, 1, 0) == -1) {
+        return true;
+    }
+    ptrace(PTRACE_DETACH, 0, 1, 0);
+    
+    return false;
+}
+
+// 检查模拟器环境
+bool utils::checkEmulatorEnvironment() {
+    // 检查常见的模拟器特征文件
+    const char* emulator_files[] = {
+        "/system/lib/libc_malloc_debug_qemu.so",
+        "/sys/qemu_trace",
+        "/system/bin/qemu-props",
+        "/dev/socket/qemud",
+        "/dev/qemu_pipe",
+        nullptr
+    };
+    
+    for (int i = 0; emulator_files[i] != nullptr; i++) {
+        if (access(emulator_files[i], F_OK) == 0) {
+            return true;
+        }
+    }
+    
+    // 检查CPU信息
+    FILE* cpuinfo = fopen("/proc/cpuinfo", "r");
+    if (cpuinfo) {
+        char line[256];
+        while (fgets(line, sizeof(line), cpuinfo)) {
+            if (strstr(line, "goldfish") || strstr(line, "ranchu")) {
+                fclose(cpuinfo);
+                return true;
+            }
+        }
+        fclose(cpuinfo);
+    }
+    
+    return false;
+}
+
+// 检查Root环境
+bool utils::checkRootEnvironment() {
+    // 检查常见的Root工具
+    const char* root_paths[] = {
+        "/system/app/Superuser.apk",
+        "/sbin/su",
+        "/system/bin/su",
+        "/system/xbin/su",
+        "/data/local/xbin/su",
+        "/data/local/bin/su",
+        "/system/sd/xbin/su",
+        "/system/bin/failsafe/su",
+        "/data/local/su",
+        "/su/bin/su",
+        nullptr
+    };
+    
+    for (int i = 0; root_paths[i] != nullptr; i++) {
+        if (access(root_paths[i], F_OK) == 0) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+// 反调试检测
+bool utils::detectAntiDebug() {
+    return checkDebuggerAttached() || checkEmulatorEnvironment() || checkRootEnvironment();
+}
+
+// 计算字符串哈希
+string utils::calculateHash(const string& input) {
+    unsigned char hash[SHA256_DIGEST_LENGTH];
+    SHA256_CTX sha256;
+    SHA256_Init(&sha256);
+    SHA256_Update(&sha256, input.c_str(), input.length());
+    SHA256_Final(hash, &sha256);
+    
+    stringstream ss;
+    for (int i = 0; i < SHA256_DIGEST_LENGTH; i++) {
+        ss << hex << setw(2) << setfill('0') << (int)hash[i];
+    }
+    return ss.str();
+}
+
+// 字符串混淆
+void utils::obfuscateString(string& str) {
+    for (char& c : str) {
+        c ^= 0xAA;
+    }
+}
+
+
+
+// 完整性校验
+bool utils::verifyIntegrity(JNIEnv *env, jobject context) {
+    // 检查签名
+    jstring signResult = Java_me_shetj_sdk_utils_Utils_verificationSign(env, nullptr, context);
+    if (!signResult) return false;
+    
+    const char* signStr = env->GetStringUTFChars(signResult, nullptr);
+    bool signValid = strcmp(signStr, "sign true") == 0;
+    env->ReleaseStringUTFChars(signResult, signStr);
+    
+    return signValid;
+}
+
+// 多层安全校验
+SecurityCheckResult utils::performSecurityCheck(JNIEnv *env, jobject context) {
+    // 1. 反调试检测
+    if (detectAntiDebug()) {
+        LOGE("Anti-debug detected!");
+        return SecurityCheckResult::ANTI_DEBUG_DETECTED;
+    }
+    
+    // 2. 包名校验
+    jstring packageName = getPackageName(env);
+    if (!packageName) {
+        return SecurityCheckResult::UNKNOWN_ERROR;
+    }
+    
+    const char* pkgStr = env->GetStringUTFChars(packageName, nullptr);
+    bool packageAllowed = isPackageInWhitelist(string(pkgStr));
+    env->ReleaseStringUTFChars(packageName, pkgStr);
+    
+    if (!packageAllowed) {
+        LOGE("Package not in whitelist!");
+        return SecurityCheckResult::PACKAGE_NOT_ALLOWED;
+    }
+    
+    // 3. 完整性校验
+    if (!verifyIntegrity(env, context)) {
+        LOGE("Integrity check failed!");
+        return SecurityCheckResult::SIGNATURE_MISMATCH;
+    }
+    
+    return SecurityCheckResult::SUCCESS;
+}
+
+// ==================== JNI接口实现 ====================
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_me_shetj_sdk_utils_Utils_performSecurityCheckNative(JNIEnv *env, jclass clazz, jobject context) {
+    SecurityCheckResult result = utils::performSecurityCheck(env, context);
+    return static_cast<jint>(result);
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_me_shetj_sdk_utils_Utils_isPackageAllowedNative(JNIEnv *env, jclass clazz, jstring packageName) {
+    if (!packageName) return JNI_FALSE;
+    
+    const char* pkgStr = env->GetStringUTFChars(packageName, nullptr);
+    bool allowed = utils::isPackageInWhitelist(string(pkgStr));
+    env->ReleaseStringUTFChars(packageName, pkgStr);
+    
+    return allowed ? JNI_TRUE : JNI_FALSE;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_me_shetj_sdk_utils_Utils_isPackageAllowedNativeNative(JNIEnv *env, jclass clazz, jstring packageName) {
+    if (!packageName) return JNI_FALSE;
+    
+    const char* pkgStr = env->GetStringUTFChars(packageName, nullptr);
+    bool allowed = utils::isPackageInWhitelist(string(pkgStr));
+    env->ReleaseStringUTFChars(packageName, pkgStr);
+    
+    return allowed ? JNI_TRUE : JNI_FALSE;
+}
+
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_me_shetj_sdk_utils_Utils_detectAntiDebugNative(JNIEnv *env, jclass clazz) {
+    return utils::detectAntiDebug() ? JNI_TRUE : JNI_FALSE;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_me_shetj_sdk_utils_Utils_verifyIntegrityNative(JNIEnv *env, jclass clazz, jobject context) {
+    return utils::verifyIntegrity(env, context) ? JNI_TRUE : JNI_FALSE;
+}
+
+extern "C"
+JNIEXPORT jobjectArray JNICALL
+Java_me_shetj_sdk_utils_Utils_getAllowedPackagesNative(JNIEnv *env, jclass clazz) {
+    vector<string> whitelist = utils::getEncryptedWhitelist();
+    
+    jclass stringClass = env->FindClass("java/lang/String");
+    jobjectArray result = env->NewObjectArray(whitelist.size(), stringClass, nullptr);
+    
+    for (size_t i = 0; i < whitelist.size(); i++) {
+        jstring jstr = env->NewStringUTF(whitelist[i].c_str());
+        env->SetObjectArrayElement(result, i, jstr);
+        env->DeleteLocalRef(jstr);
+    }
+    
+    return result;
+}
+
+// 动态白名单管理 (运行时修改，仅用于测试)
+static unordered_set<string> dynamicWhitelist;
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_me_shetj_sdk_utils_Utils_addPackageToWhitelistNative(JNIEnv *env, jclass clazz, jstring packageName) {
+    if (!packageName) return JNI_FALSE;
+    
+    const char* pkgStr = env->GetStringUTFChars(packageName, nullptr);
+    dynamicWhitelist.insert(string(pkgStr));
+    env->ReleaseStringUTFChars(packageName, pkgStr);
+    
+    LOGI("Package added to dynamic whitelist: %s", pkgStr);
+    return JNI_TRUE;
+}
+
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_me_shetj_sdk_utils_Utils_removePackageFromWhitelistNative(JNIEnv *env, jclass clazz, jstring packageName) {
+    if (!packageName) return JNI_FALSE;
+    
+    const char* pkgStr = env->GetStringUTFChars(packageName, nullptr);
+    auto it = dynamicWhitelist.find(string(pkgStr));
+    if (it != dynamicWhitelist.end()) {
+        dynamicWhitelist.erase(it);
+        env->ReleaseStringUTFChars(packageName, pkgStr);
+        LOGI("Package removed from dynamic whitelist: %s", pkgStr);
+        return JNI_TRUE;
+    }
+    
+    env->ReleaseStringUTFChars(packageName, pkgStr);
+    return JNI_FALSE;
+}
+
+// ==================== 包名白名单管理JNI接口实现 ====================
+// 注意：已移除所有XOR加密相关的JNI接口，现在使用明文白名单算法

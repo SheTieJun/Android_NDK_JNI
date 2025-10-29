@@ -31,7 +31,75 @@ class CUrlKit {
         external fun setCertificate(certificatePath: String)
     }
 
-    external fun postJson(url:String,json:String):String
+    // 基础HTTP方法
+    external fun get(url: String): String
+    external fun post(url: String, body: String): String
+    external fun put(url: String, body: String): String
+    external fun delete(url: String): String
+    external fun head(url: String): String
+    external fun patch(url: String, body: String): String
+    external fun options(url: String): String
 
-    external fun get(url:String):String
+    // JSON请求方法
+    external fun postJson(url: String, json: String): String
+    external fun putJson(url: String, json: String): String
+    external fun patchJson(url: String, json: String): String
+
+    // 高级请求方法 - 支持完整配置
+    external fun request(
+        url: String,
+        method: String,
+        headers: Array<String>?,
+        body: String?,
+        timeout: Int,
+        connectTimeout: Int,
+        userAgent: String?,
+        cookies: String?,
+        followRedirects: Boolean,
+        maxRedirects: Int,
+        certificatePath: String?,
+        ignoreSSL: Boolean
+    ): String
+
+    // 获取响应详情（包含状态码、头部等）
+    external fun requestWithDetails(
+        url: String,
+        method: String,
+        headers: Array<String>?,
+        body: String?,
+        timeout: Int,
+        connectTimeout: Int,
+        userAgent: String?,
+        cookies: String?,
+        followRedirects: Boolean,
+        maxRedirects: Int,
+        certificatePath: String?,
+        ignoreSSL: Boolean
+    ): String // 返回JSON格式的详细响应信息
+
+    // 文件下载
+    external fun downloadFile(url: String, filePath: String): Boolean
+
+    // 文件上传
+    external fun uploadFile(url: String, filePath: String, fieldName: String): String
+
+    // 批量请求
+    external fun batchRequest(requests: Array<String>): Array<String>
+
+    // 连接池管理
+    external fun setMaxConnections(maxConnections: Int)
+    external fun setKeepAlive(keepAlive: Boolean)
+    external fun setConnectionPoolTimeout(timeout: Int)
+
+    // 代理设置
+    external fun setProxy(proxyUrl: String, proxyType: String)
+    external fun setProxyAuth(username: String, password: String)
+
+    // DNS设置
+    external fun setDnsServers(dnsServers: Array<String>)
+    external fun setDnsTimeout(timeout: Int)
+
+    // 性能监控
+    external fun getConnectionStats(): String
+    external fun resetConnectionStats()
 }
