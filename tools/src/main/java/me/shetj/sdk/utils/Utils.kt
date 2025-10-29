@@ -71,13 +71,7 @@ class Utils {
         @JvmStatic
         external fun getPackageName(): String
 
-        /**
-         * 验证包名是否合法（兼容旧版本）
-         *
-         * @return "pkg true" 表示合法，"pkg error" 表示不合法
-         */
-        @JvmStatic
-        external fun verificationPkg(): String
+
 
         /**
          * 验证应用签名（兼容旧版本）
@@ -189,32 +183,6 @@ class Utils {
             return getAllowedPackagesNative() ?: emptyArray()
         }
 
-        // ==================== 动态白名单管理（仅用于测试） ====================
-
-        /**
-         * 添加包名到动态白名单（仅用于测试环境）
-         *
-         * 注意：此功能仅在测试环境下使用，生产环境应使用预定义的加密白名单
-         *
-         * @param packageName 要添加的包名
-         * @return true表示添加成功，false表示失败
-         */
-        @JvmStatic
-        fun addPackageToWhitelist(packageName: String): Boolean {
-            return addPackageToWhitelistNative(packageName)
-        }
-
-        /**
-         * 从动态白名单中移除包名（仅用于测试环境）
-         *
-         * @param packageName 要移除的包名
-         * @return true表示移除成功，false表示失败
-         */
-        @JvmStatic
-        fun removePackageFromWhitelist(packageName: String): Boolean {
-            return removePackageFromWhitelistNative(packageName)
-        }
-
         // ==================== 便捷方法 ====================
 
         /**
@@ -294,10 +262,5 @@ class Utils {
         @JvmStatic
         external fun getAllowedPackagesNative(): Array<String>?
 
-        @JvmStatic
-        external fun addPackageToWhitelistNative(packageName: String): Boolean
-
-        @JvmStatic
-        external fun removePackageFromWhitelistNative(packageName: String): Boolean
     }
 }

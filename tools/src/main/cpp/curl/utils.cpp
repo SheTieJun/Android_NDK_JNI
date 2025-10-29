@@ -101,7 +101,6 @@ const char* RELEASE_SIGN = "3082036930820251a00302010202042394e404300d06092a8648
                            "87482f6e722eadf177c26de170cdd269acd60f718432d41b44dbc94106b3fe852212550df68bbc43b13cede4c44a5391ef1b"
                            "f33d48119c5cefaddb68c070467743661e753ef36637b34d61b209a401a11815a418dde79673331d77a35941ab82e0858096"
                            "59ec09d3c67c465aa47d89502b1cf8e555e33f5b386e815048e44c";
-const char* RELEASE_PACKAGE = "me.shetj.sdk.ffmepg.demo";
 
 extern "C"
 JNIEXPORT jstring JNICALL
@@ -165,17 +164,7 @@ Java_me_shetj_sdk_utils_Utils_verificationSign(JNIEnv *env, jclass clazz, jobjec
 
 }
 
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_me_shetj_sdk_utils_Utils_verificationPkg(JNIEnv *env, jclass clazz) {
-    jstring packageName = getPackageName(env);
-    const char* c_pkg = (char*)env->GetStringUTFChars(packageName, 0);
-    if(strcmp(c_pkg, RELEASE_PACKAGE)==0) {
-        return (env)->NewStringUTF("pkg true");
-    } else {
-        return (env)->NewStringUTF("pkg error");
-    }
-}
+
 
 // ==================== 新增安全校验功能实现 ====================
 
@@ -490,40 +479,3 @@ Java_me_shetj_sdk_utils_Utils_getAllowedPackagesNative(JNIEnv *env, jclass clazz
     
     return result;
 }
-
-// 动态白名单管理 (运行时修改，仅用于测试)
-static unordered_set<string> dynamicWhitelist;
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_me_shetj_sdk_utils_Utils_addPackageToWhitelistNative(JNIEnv *env, jclass clazz, jstring packageName) {
-    if (!packageName) return JNI_FALSE;
-    
-    const char* pkgStr = env->GetStringUTFChars(packageName, nullptr);
-    dynamicWhitelist.insert(string(pkgStr));
-    env->ReleaseStringUTFChars(packageName, pkgStr);
-    
-    LOGI("Package added to dynamic whitelist: %s", pkgStr);
-    return JNI_TRUE;
-}
-
-extern "C"
-JNIEXPORT jboolean JNICALL
-Java_me_shetj_sdk_utils_Utils_removePackageFromWhitelistNative(JNIEnv *env, jclass clazz, jstring packageName) {
-    if (!packageName) return JNI_FALSE;
-    
-    const char* pkgStr = env->GetStringUTFChars(packageName, nullptr);
-    auto it = dynamicWhitelist.find(string(pkgStr));
-    if (it != dynamicWhitelist.end()) {
-        dynamicWhitelist.erase(it);
-        env->ReleaseStringUTFChars(packageName, pkgStr);
-        LOGI("Package removed from dynamic whitelist: %s", pkgStr);
-        return JNI_TRUE;
-    }
-    
-    env->ReleaseStringUTFChars(packageName, pkgStr);
-    return JNI_FALSE;
-}
-
-// ==================== 包名白名单管理JNI接口实现 ====================
-// 注意：已移除所有XOR加密相关的JNI接口，现在使用明文白名单算法

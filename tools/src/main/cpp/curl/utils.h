@@ -84,8 +84,7 @@ extern "C" {
     // 现有接口
     JNIEXPORT jstring JNICALL Java_me_shetj_sdk_utils_Utils_getPackageName(JNIEnv *env, jclass clazz);
     JNIEXPORT jstring JNICALL Java_me_shetj_sdk_utils_Utils_verificationSign(JNIEnv *env, jclass clazz,jobject context);
-    JNIEXPORT jstring JNICALL Java_me_shetj_sdk_utils_Utils_verificationPkg(JNIEnv *env, jclass clazz);
-    
+
     // 新增安全校验接口
     JNIEXPORT jint JNICALL Java_me_shetj_sdk_utils_Utils_performSecurityCheckNative(JNIEnv *env, jclass clazz, jobject context);
     JNIEXPORT jboolean JNICALL Java_me_shetj_sdk_utils_Utils_isPackageAllowedNative(JNIEnv *env, jclass clazz, jstring packageName);
@@ -94,9 +93,7 @@ extern "C" {
     JNIEXPORT jboolean JNICALL Java_me_shetj_sdk_utils_Utils_detectAntiDebugNative(JNIEnv *env, jclass clazz);
     JNIEXPORT jboolean JNICALL Java_me_shetj_sdk_utils_Utils_verifyIntegrityNative(JNIEnv *env, jclass clazz, jobject context);
     JNIEXPORT jobjectArray JNICALL Java_me_shetj_sdk_utils_Utils_getAllowedPackagesNative(JNIEnv *env, jclass clazz);
-    JNIEXPORT jboolean JNICALL Java_me_shetj_sdk_utils_Utils_addPackageToWhitelistNative(JNIEnv *env, jclass clazz, jstring packageName);
-    JNIEXPORT jboolean JNICALL Java_me_shetj_sdk_utils_Utils_removePackageFromWhitelistNative(JNIEnv *env, jclass clazz, jstring packageName);
-    
+
 
 }
 
