@@ -22,6 +22,7 @@ class RecordUtils(
 ) : RecordListener, PermissionListener,PCMListener {
 
     private var isOpenWebRtcNS: Boolean = false
+    private var nsKit: WebRtcNsKit? = null
     private var bgmUrl: Uri? = null
     private var listener: PlayerListener? = null
     private var recorderType: BaseRecorder.RecorderType = BaseRecorder.RecorderType.MIX
@@ -149,10 +150,14 @@ class RecordUtils(
 
     fun clear() {
         mRecorder?.destroy()
+        nsKit?.free()
+        nsKit = null
     }
 
     fun reset() {
         mRecorder?.reset()
+        nsKit?.free()
+        nsKit = null
     }
 
     /**
@@ -186,6 +191,8 @@ class RecordUtils(
      */
     fun complete() {
         mRecorder?.complete()
+        nsKit?.free()
+        nsKit = null
         Log.i("RecordUtils", "complete:$saveFile")
     }
 
@@ -243,15 +250,21 @@ class RecordUtils(
 
     override fun onBeforePCMToMp3(pcm: ShortArray): ShortArray {
         if (isOpenWebRtcNS){
-            WebRtcNsKit.noiseSuppressionByShort(pcm)
-        }else{
-
+            if (nsKit == null) {
+                nsKit = WebRtcNsKit()
+                nsKit?.create(sampleRate = 48000, num_channels = 1, level = 2) // 强力降噪
+            }
+            return nsKit!!.processAndFlush(pcm)
         }
         return pcm
     }
 
     fun setWebRtcNS(b: Boolean) {
         this.isOpenWebRtcNS = b
+        if (!b) {
+            nsKit?.free()
+            nsKit = null
+        }
     }
 
 }
