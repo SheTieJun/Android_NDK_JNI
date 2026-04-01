@@ -33,7 +33,11 @@ object WebRtcNs {
     external fun webRtcNsFree(nsHandler: Long,abHandler:Long,scHandler:Long)
 
     /**
-     * 音频降噪
+     * 音频降噪 (处理字节数据)
+     * 
+     * ⚠️ 注意：WebRTC 降噪算法内部严格以 10ms 为一帧进行处理。
+     * 例如 16000Hz 采样率下，10ms 包含 160 个样本（320字节）。
+     * 传入的数组长度最好是 10ms 的整数倍，否则尾部不足 10ms 的数据将被原样保留（不处理）。
      */
     external fun noiseSuppressionByBytes(
         nsHandler: Long,
@@ -43,7 +47,11 @@ object WebRtcNs {
 
 
     /**
-     * 音频降噪
+     * 音频降噪 (处理 Short 数据)
+     * 
+     * ⚠️ 注意：WebRTC 降噪算法内部严格以 10ms 为一帧进行处理。
+     * 例如 44100Hz 采样率下，10ms 包含 441 个样本。
+     * 传入的数组长度最好是 10ms 的整数倍，否则尾部不足 10ms 的数据将被原样保留（不处理）。
      */
     external fun noiseSuppressionByShort(
         nsHandler: Long,abHandler:Long,scHandler:Long,

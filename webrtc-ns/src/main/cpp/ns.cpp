@@ -45,23 +45,30 @@ Java_com_shetj_webrtc_ns_WebRtcNs_noiseSuppressionByBytes(JNIEnv *env, jobject t
     auto *stream_config = (StreamConfig *) sc_handler;
 
     jbyte *input = env->GetByteArrayElements(inputbuffer, NULL);
+    jsize input_length_bytes = env->GetArrayLength(inputbuffer);
 
     auto *input_short = (jshort *) input;
-    int sampleRate  = stream_config->sample_rate_hz();
+    size_t input_length_shorts = input_length_bytes / 2;
 
+    int sampleRate  = stream_config->sample_rate_hz();
+    size_t chunk_length = stream_config->num_samples(); // shorts per 10ms frame
     bool split_bands = sampleRate > 16000;
 
-    audio->CopyFrom(input_short, *stream_config);
+    // WebRTC NS strictly processes 10ms of audio per call.
+    // We must iterate over the buffer in 10ms chunks.
+    for (size_t offset = 0; offset + chunk_length <= input_length_shorts; offset += chunk_length) {
+        audio->CopyFrom(input_short + offset, *stream_config);
 
-    if (split_bands) {
-        audio->SplitIntoFrequencyBands();
+        if (split_bands) {
+            audio->SplitIntoFrequencyBands();
+        }
+        ns->Analyze(*audio);
+        ns->Process(audio);
+        if (split_bands) {
+            audio->MergeFrequencyBands();
+        }
+        audio->CopyTo(*stream_config, input_short + offset);
     }
-    ns->Analyze(*audio);
-    ns->Process(audio);
-    if (split_bands) {
-        audio->MergeFrequencyBands();
-    }
-    audio->CopyTo(*stream_config, input_short);
 
     env->ReleaseByteArrayElements(inputbuffer, input, 0);
 
@@ -78,21 +85,26 @@ Java_com_shetj_webrtc_ns_WebRtcNs_noiseSuppressionByShort(JNIEnv *env, jobject t
     auto *stream_config = (StreamConfig *) sc_handler;
 
     jshort *input = env->GetShortArrayElements(inputbuffer, NULL);
-    int sampleRate  = stream_config->sample_rate_hz();
+    jsize input_length = env->GetArrayLength(inputbuffer);
 
+    int sampleRate  = stream_config->sample_rate_hz();
+    size_t chunk_length = stream_config->num_samples(); // shorts per 10ms frame
     bool split_bands = sampleRate > 16000;
 
-    audio->CopyFrom(input, *stream_config);
+    // WebRTC NS strictly processes 10ms of audio per call.
+    for (size_t offset = 0; offset + chunk_length <= (size_t)input_length; offset += chunk_length) {
+        audio->CopyFrom(input + offset, *stream_config);
 
-    if (split_bands) {
-        audio->SplitIntoFrequencyBands();
+        if (split_bands) {
+            audio->SplitIntoFrequencyBands();
+        }
+        ns->Analyze(*audio);
+        ns->Process(audio);
+        if (split_bands) {
+            audio->MergeFrequencyBands();
+        }
+        audio->CopyTo(*stream_config, input + offset);
     }
-    ns->Analyze(*audio);
-    ns->Process(audio);
-    if (split_bands) {
-        audio->MergeFrequencyBands();
-    }
-    audio->CopyTo(*stream_config, input);
     env->ReleaseShortArrayElements(inputbuffer, input, 0);
 }
 extern "C"
