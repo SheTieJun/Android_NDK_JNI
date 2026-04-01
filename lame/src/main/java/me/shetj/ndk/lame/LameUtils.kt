@@ -48,24 +48,32 @@ package me.shetj.ndk.lame
  * - MP3 输出缓冲区建议至少为输入 PCM 数据的 1.25 倍
  * - VBR 模式下必须调用 [writeVBRHeader] 写入正确的头信息（不建议使用）
  */
-object LameUtils {
+class LameUtils {
 
-    init {
-        System.loadLibrary("shetj_mp3lame")
+    private var lameHandle: Long = 0L
+
+    companion object {
+        init {
+            System.loadLibrary("shetj_mp3lame")
+        }
+
+        /**
+         * 获取 LAME 库版本信息
+         * 
+         * @return LAME 库的版本字符串
+         * 
+         * @sample
+         * ```kotlin
+         * val version = LameUtils.version()
+         * println("LAME Version: $version")
+         * ```
+         */
+        @JvmStatic
+        external fun version(): String
+
+        @JvmStatic
+        external fun getPCMDB(pcm: ShortArray, samples: Int): Int
     }
-
-    /**
-     * 获取 LAME 库版本信息
-     * 
-     * @return LAME 库的版本字符串
-     * 
-     * @sample
-     * ```kotlin
-     * val version = LameUtils.version()
-     * println("LAME Version: $version")
-     * ```
-     */
-    external fun version(): String
 
     /**
      * 初始化 LAME 编码器
@@ -126,7 +134,7 @@ object LameUtils {
      * )
      * ```
      */
-    external fun init(
+    fun init(
         inSampleRate: Int,
         inChannel: Int,
         outSampleRate: Int,
@@ -136,7 +144,15 @@ object LameUtils {
         highpassFreq: Int,
         vbr: Boolean,
         enableLog: Boolean
-    )
+    ) {
+        if (lameHandle != 0L) {
+            close()
+        }
+        lameHandle = initNative(
+            inSampleRate, inChannel, outSampleRate, outBitrate, quality,
+            lowpassFreq, highpassFreq, vbr, enableLog
+        )
+    }
 
     /**
      * 编码 PCM 音频数据（分离声道模式）
@@ -184,12 +200,15 @@ object LameUtils {
      * }
      * ```
      */
-    external fun encode(
+    fun encode(
         bufferLeft: ShortArray,
         bufferRight: ShortArray,
         samples: Int,
         mp3buf: ByteArray
-    ): Int
+    ): Int {
+        if (lameHandle == 0L) return -3
+        return encodeNative(lameHandle, bufferLeft, bufferRight, samples, mp3buf)
+    }
 
     /**
      * 编码交错的立体声 PCM 数据
@@ -222,11 +241,14 @@ object LameUtils {
      * }
      * ```
      */
-    external fun encodeInterleaved(
+    fun encodeInterleaved(
         pcm: ShortArray,
         samples: Int,
         mp3buf: ByteArray
-    ): Int
+    ): Int {
+        if (lameHandle == 0L) return -3
+        return encodeInterleavedNative(lameHandle, pcm, samples, mp3buf)
+    }
 
     /**
      * 编码字节数组格式的 PCM 数据（分离声道模式）
@@ -250,12 +272,15 @@ object LameUtils {
      * val result = LameUtils.encodeByByte(leftChannel, rightChannel, 1024, mp3Buffer)
      * ```
      */
-    external fun encodeByByte(
+    fun encodeByByte(
         bufferLeft: ByteArray,
         bufferRight: ByteArray,
         samples: Int,
         mp3buf: ByteArray
-    ): Int
+    ): Int {
+        if (lameHandle == 0L) return -3
+        return encodeByByteNative(lameHandle, bufferLeft, bufferRight, samples, mp3buf)
+    }
 
     /**
      * 编码字节数组格式的交错立体声 PCM 数据
@@ -276,11 +301,14 @@ object LameUtils {
      * val result = LameUtils.encodeInterleavedByByte(interleavedBytes, 1024, mp3Buffer)
      * ```
      */
-    external fun encodeInterleavedByByte(
+    fun encodeInterleavedByByte(
         pcm: ByteArray,
         samples: Int,
         mp3buf: ByteArray
-    ): Int
+    ): Int {
+        if (lameHandle == 0L) return -3
+        return encodeInterleavedByByteNative(lameHandle, pcm, samples, mp3buf)
+    }
 
     /**
      * 写入 VBR 头信息到 MP3 文件
@@ -327,7 +355,11 @@ object LameUtils {
      * LameUtils.close()
      * ```
      */
-    external fun writeVBRHeader(file: String)
+    fun writeVBRHeader(file: String) {
+        if (lameHandle != 0L) {
+            writeVBRHeaderNative(lameHandle, file)
+        }
+    }
 
     /**
      * 刷新编码器缓冲区
@@ -354,7 +386,10 @@ object LameUtils {
      * }
      * ```
      */
-    external fun flush(mp3buf: ByteArray): Int
+    fun flush(mp3buf: ByteArray): Int {
+        if (lameHandle == 0L) return -3
+        return flushNative(lameHandle, mp3buf)
+    }
 
     /**
      * 关闭编码器并释放资源
@@ -378,8 +413,58 @@ object LameUtils {
      * }
      * ```
      */
-    external fun close()
+    fun close() {
+        if (lameHandle != 0L) {
+            closeNative(lameHandle)
+            lameHandle = 0L
+        }
+    }
 
+    private external fun initNative(
+        inSampleRate: Int,
+        inChannel: Int,
+        outSampleRate: Int,
+        outBitrate: Int,
+        quality: Int,
+        lowpassFreq: Int,
+        highpassFreq: Int,
+        vbr: Boolean,
+        enableLog: Boolean
+    ): Long
 
-    external fun getPCMDB(pcm: ShortArray, samples: Int): Int
+    private external fun encodeNative(
+        handle: Long,
+        bufferLeft: ShortArray,
+        bufferRight: ShortArray,
+        samples: Int,
+        mp3buf: ByteArray
+    ): Int
+
+    private external fun encodeInterleavedNative(
+        handle: Long,
+        pcm: ShortArray,
+        samples: Int,
+        mp3buf: ByteArray
+    ): Int
+
+    private external fun encodeByByteNative(
+        handle: Long,
+        bufferLeft: ByteArray,
+        bufferRight: ByteArray,
+        samples: Int,
+        mp3buf: ByteArray
+    ): Int
+
+    private external fun encodeInterleavedByByteNative(
+        handle: Long,
+        pcm: ByteArray,
+        samples: Int,
+        mp3buf: ByteArray
+    ): Int
+
+    private external fun writeVBRHeaderNative(handle: Long, file: String)
+
+    private external fun flushNative(handle: Long, mp3buf: ByteArray): Int
+
+    private external fun closeNative(handle: Long)
 }

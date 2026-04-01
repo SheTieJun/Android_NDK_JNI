@@ -19,8 +19,6 @@
 #define TRUE 1
 #define FALSE 0
 
-static lame_global_flags *lame = NULL;
-
 JNIEXPORT jstring JNICALL Java_me_shetj_ndk_lame_LameUtils_version(
         JNIEnv *env,
         jclass jcls) {
@@ -45,9 +43,9 @@ void wMsg(const char *msg, va_list vaList) {
     LogD("%s", string);
 }
 
-JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
+JNIEXPORT jlong JNICALL Java_me_shetj_ndk_lame_LameUtils_initNative(
         JNIEnv *env,
-        jclass cls,
+        jobject thiz,
         jint inSamplerate,
         jint inChannel,
         jint outSamplerate,
@@ -57,11 +55,8 @@ JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
         jint highpassfreq,
         jboolean vbr,
         jboolean enableLog) {
-    if (lame != NULL) {
-        lame_close(lame);
-        lame = NULL;
-    }
-    lame = lame_init();
+    
+    lame_global_flags *lame = lame_init();
     //初始化，设置参数
     lame_set_in_samplerate(lame, inSamplerate);//输入采样率
     lame_set_out_samplerate(lame, outSamplerate);//输出采样率
@@ -86,17 +81,22 @@ JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_init(
              highpassfreq,vbr);
     }
     lame_init_params(lame);
+    return (jlong) lame;
 }
 
 
 
-JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encode(
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeNative(
         JNIEnv *env,
-        jclass cls,
+        jobject thiz,
+        jlong handle,
         jshortArray buffer_left,
         jshortArray buffer_right,
         jint samples,
         jbyteArray mp3buf) {
+
+    lame_global_flags *lame = (lame_global_flags *) handle;
+    if (lame == NULL) return -3;
 
     //把Java传过来参数转成C中的参数进行修改
     jshort *j_buff_left = (*env)->GetShortArrayElements(env, buffer_left, NULL);
@@ -118,12 +118,16 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encode(
 
 }
 
-JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleaved(
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleavedNative(
         JNIEnv *env,
-        jclass cls,
+        jobject thiz,
+        jlong handle,
         jshortArray pcm_buffer,
         jint samples,
         jbyteArray mp3buf) {
+
+    lame_global_flags *lame = (lame_global_flags *) handle;
+    if (lame == NULL) return -3;
 
     //把Java传过来参数转成C中的参数进行修改
     jshort *j_pcm_buffer = (*env)->GetShortArrayElements(env, pcm_buffer, NULL);
@@ -143,12 +147,16 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleaved(
 }
 
 
-JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleavedByByte(
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleavedByByteNative(
         JNIEnv *env,
-        jclass cls,
+        jobject thiz,
+        jlong handle,
         jbyteArray pcm_buffer,
         jint samples,
         jbyteArray mp3buf) {
+
+    lame_global_flags *lame = (lame_global_flags *) handle;
+    if (lame == NULL) return -3;
 
     //把Java传过来参数转成C中的参数进行修改
     jbyte *j_pcm_buffer = (*env)->GetByteArrayElements(env, pcm_buffer, NULL);
@@ -168,13 +176,17 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeInterleavedByByte(
 }
 
 
-JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeByByte(
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeByByteNative(
         JNIEnv *env,
-        jclass cls,
+        jobject thiz,
+        jlong handle,
         jbyteArray buffer_left,
         jbyteArray buffer_right,
         jint samples,
         jbyteArray mp3buf) {
+
+    lame_global_flags *lame = (lame_global_flags *) handle;
+    if (lame == NULL) return -3;
 
     //把Java传过来参数转成C中的参数进行修改
     jbyte *j_buff_left = (*env)->GetByteArrayElements(env, buffer_left, NULL);
@@ -195,10 +207,14 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_encodeByByte(
 
 }
 
-JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_flush(
+JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_flushNative(
         JNIEnv *env,
-        jclass cls,
+        jobject thiz,
+        jlong handle,
         jbyteArray mp3buf) {
+    
+    lame_global_flags *lame = (lame_global_flags *) handle;
+    if (lame == NULL) return -3;
     const jsize mp3buf_size = (*env)->GetArrayLength(env, mp3buf);
 
     jbyte *j_mp3buff = (*env)->GetByteArrayElements(env, mp3buf, NULL);
@@ -210,11 +226,14 @@ JNIEXPORT jint JNICALL Java_me_shetj_ndk_lame_LameUtils_flush(
     return result;
 }
 
-JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_close(
+JNIEXPORT void JNICALL Java_me_shetj_ndk_lame_LameUtils_closeNative(
         JNIEnv *env,
-        jclass cls) {
-    lame_close(lame);
-    lame = NULL;
+        jobject thiz,
+        jlong handle) {
+    lame_global_flags *lame = (lame_global_flags *) handle;
+    if (lame != NULL) {
+        lame_close(lame);
+    }
 }
 
 // jstring转string类型方法
@@ -240,7 +259,9 @@ char *jstring2string(JNIEnv *env, jstring jstr) {
 }
 
 JNIEXPORT void JNICALL
-Java_me_shetj_ndk_lame_LameUtils_writeVBRHeader(JNIEnv *env, jobject thiz, jstring file) {
+Java_me_shetj_ndk_lame_LameUtils_writeVBRHeaderNative(JNIEnv *env, jobject thiz, jlong handle, jstring file) {
+    lame_global_flags *lame = (lame_global_flags *) handle;
+    if (lame == NULL) return;
     char *path = jstring2string(env, file);
     FILE *mp3File = fopen(path, "ab+");
     lame_mp3_tags_fid(lame, mp3File);
@@ -248,7 +269,7 @@ Java_me_shetj_ndk_lame_LameUtils_writeVBRHeader(JNIEnv *env, jobject thiz, jstri
 }
 
 JNIEXPORT jint JNICALL
-Java_me_shetj_ndk_lame_LameUtils_getPCMDB(JNIEnv *env, jobject thiz, jshortArray pcm,
+Java_me_shetj_ndk_lame_LameUtils_getPCMDB(JNIEnv *env, jclass jcls, jshortArray pcm,
                                           jint samples) {
 
     int db = 0;
